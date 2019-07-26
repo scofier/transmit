@@ -27,10 +27,13 @@ public class Config {
      * @param target
      * @return
      */
-    public boolean put(ConvertData source, ConvertData target) {
+    public boolean put(ConvertData source, ConvertData target, Long timeOut) {
         ConvertMapping convertMapping = new ConvertMapping();
         convertMapping.setSource(source);
         convertMapping.setTarget(target);
+        if (timeOut != null) {
+            convertMapping.setTimeOut(timeOut);
+        }
         String key = key(source, target);
         if (convertMappings.containsKey(key)) {
             return false;

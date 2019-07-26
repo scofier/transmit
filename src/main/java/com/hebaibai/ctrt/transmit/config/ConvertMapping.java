@@ -22,6 +22,14 @@ public class ConvertMapping {
     @Setter
     private ConvertData target;
 
+    /**
+     * 请求超时时间
+     * 默认3秒
+     */
+    @Getter
+    @Setter
+    private long timeOut = 3 * 1000;
+
 
     public DataType sourceDataType() {
         return source.getDataType();

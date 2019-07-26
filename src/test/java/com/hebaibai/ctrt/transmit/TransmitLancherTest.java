@@ -35,9 +35,11 @@ public class TransmitLancherTest {
                 }},
                 new ConvertData() {{
                     this.setDataType(DataType.xml);
-                    setMethod(HttpMethod.GET);
-                    setPath("https://www.baidu.com");
-                }}
+                    setMethod(HttpMethod.POST);
+                    setConvertFilePath("/home/hjx/work/myProject/transmit/file/xml.ftl");
+                    setPath("http://127.0.0.1:8891/test/demo");
+                }},
+                3 * 1000L
         );
 
         ctrtLancher.start(config);

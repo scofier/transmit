@@ -60,7 +60,9 @@ public class TransmitVerticle extends AbstractVerticle {
                         response.end(errorMsg(event.cause()));
                         return;
                     }
-                    convertReturn(event.result().bodyAsString(enc), mapping, result -> {
+                    //接口原始返回数据
+                    String bodyAsString = event.result().bodyAsString(enc);
+                    convertReturn(bodyAsString, mapping, result -> {
                         if (result.failed()) {
                             response.end(errorMsg(result.cause()));
                             return;
@@ -79,7 +81,7 @@ public class TransmitVerticle extends AbstractVerticle {
     }
 
     /**
-     * 转换并发送请求
+     * 转换请求参数并转发请求
      *
      * @param params
      * @param body
@@ -88,13 +90,16 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndSend(MultiMap params, String body, ConvertMapping mapping, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
         ConvertData source = mapping.getSource();
         ConvertData target = mapping.getTarget();
-        //转发请求路径
+        DataType dataType = source.getDataType();
+        //设置请求
         HttpRequest<Buffer> request = webClient.requestAbs(target.getMethod(), target.getPath());
-        //表单提交
-        if (source.getDataType() == DataType.from) {
+        request.timeout(mapping.getTimeOut());
+        //TODO: 表单形式/文本形式 原始信息直接请求
+        if (source.getDataType() == DataType.from || source.getDataType() == DataType.text) {
             request.sendForm(params, res -> handler.handle(res));
-        } else {
-            DataType dataType = source.getDataType();
+        }
+        // 处理 json/xml 类型数据
+        else {
             DataReader reader = getReader(dataType);
             try {
                 reader.read(body);
@@ -109,9 +114,24 @@ public class TransmitVerticle extends AbstractVerticle {
         }
     }
 
+    /**
+     * 转换返回参数
+     *
+     * @param body
+     * @param mapping
+     * @param handler
+     */
     private void convertReturn(String body, ConvertMapping mapping, Handler<AsyncResult<String>> handler) {
         ConvertData target = mapping.getTarget();
+        DataType dataType = target.getDataType();
         DataReader reader = getReader(target.getDataType());
+        if (dataType == DataType.from) {
+            handler.handle(Future.succeededFuture(body));
+        }
+        //TODO: 文本形式 原始信息直接请求
+        else if (dataType == DataType.text) {
+            handler.handle(Future.succeededFuture(body));
+        }
         try {
             reader.read(body);
             Map<String, Object> requestData = reader.getRequestData();
