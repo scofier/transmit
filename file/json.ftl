@@ -1,3 +1,0 @@
-{
-"p-name": "${ROOT.name}",
-}

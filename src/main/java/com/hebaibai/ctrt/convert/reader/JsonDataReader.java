@@ -17,7 +17,7 @@ public class JsonDataReader extends AbstractDataReader implements DataReader {
      * @return
      */
     @Override
-    public void read(String stringData) throws Exception {
+    public void read(String stringData) {
         this.beConvertData = stringData;
         for (char c : stringData.toCharArray()) {
             if (c == '\u0000') {

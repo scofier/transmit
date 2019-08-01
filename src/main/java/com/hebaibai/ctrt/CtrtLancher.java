@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt;
 
 import com.hebaibai.ctrt.transmit.TransmitVerticle;
-import com.hebaibai.ctrt.transmit.config.Config;
+import com.hebaibai.ctrt.transmit.Config;
 import io.vertx.core.Vertx;
 
 import java.util.ArrayList;
