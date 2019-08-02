@@ -37,9 +37,14 @@ public class TransmitConfig {
     private HttpMethod apiMethod;
 
     /**
-     * 转发数据类型
+     * 转发数据请求类型
      */
     private DataType apiReqType;
+
+    /**
+     * 转发数据响应类型
+     */
+    private DataType apiResType;
 
     /**
      * 转发请求数据转换模板
@@ -141,5 +146,13 @@ public class TransmitConfig {
 
     public void setResType(DataType resType) {
         this.resType = resType;
+    }
+
+    public DataType getApiResType() {
+        return apiResType;
+    }
+
+    public void setApiResType(DataType apiResType) {
+        this.apiResType = apiResType;
     }
 }

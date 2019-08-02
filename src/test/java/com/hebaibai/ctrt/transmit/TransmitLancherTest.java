@@ -25,6 +25,29 @@ public class TransmitLancherTest {
         Config config = new Config();
         config.setPort(9090);
         config.put(new TransmitConfig() {{
+            //路由地址
+            setReqPath("/post");
+            //路由地址请求方式
+            setReqMethod(HttpMethod.POST);
+            //入参类型 表单提交
+            setReqType(DataType.FROM);
+            //出参类型 json
+            setResType(DataType.JSON);
+            //=========================================
+            //转发接口地址
+            setApiPath("http://127.0.0.1:8080/post");
+            //转发接口请求方式 POST
+            setApiMethod(HttpMethod.POST);
+            //转发接口请求参数类型 表单
+            setApiReqType(DataType.FROM);
+            //转发接口响应参数类型 JSON
+            setApiResType(DataType.JSON);
+            //转发接口请求参数转换模板
+            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/post-req.ftl"));
+            //转发接口响应参数转换模板
+            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/post-res.ftl"));
+        }});
+        config.put(new TransmitConfig() {{
             setReqPath("/json");
             setReqMethod(HttpMethod.POST);
             setReqType(DataType.JSON);
@@ -35,19 +58,7 @@ public class TransmitLancherTest {
             setReqType(DataType.JSON);
         }});
         config.put(new TransmitConfig() {{
-            setReqPath("/post");
-            setReqMethod(HttpMethod.POST);
-            setReqType(DataType.FROM);
-            setResType(DataType.JSON);
-
-            setApiPath("http://127.0.0.1:8891/test/json");
-            setApiMethod(HttpMethod.POST);
-            setApiReqType(DataType.JSON);
-            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/api-req-json.ftl"));
-            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/api-res-json.ftl"));
-        }});
-        config.put(new TransmitConfig() {{
-            setReqPath("/get");
+            setReqPath("/params");
             setReqMethod(HttpMethod.GET);
             setReqType(DataType.QUERY);
         }});

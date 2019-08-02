@@ -1,14 +1,10 @@
-package com.hebaibai.ctrt.transmit.util;
+package com.hebaibai.ctrt.transmit.util.param;
 
 import com.hebaibai.ctrt.convert.reader.DataReader;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.RouterVo;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
-import io.vertx.core.buffer.Buffer;
+import com.hebaibai.ctrt.transmit.util.Param;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.web.client.HttpResponse;
-import io.vertx.ext.web.client.WebClient;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -17,7 +13,7 @@ import java.util.Map;
 /**
  * @author hjx
  */
-public class PostFormBody implements ParamGet, Request {
+public class PostFormParam implements Param {
 
     @Override
     public boolean support(HttpMethod method, DataType dataType) {
@@ -25,7 +21,7 @@ public class PostFormBody implements ParamGet, Request {
     }
 
     @Override
-    public Map<String, Object> get(RouterVo routerVo) {
+    public Map<String, Object> params(RouterVo routerVo) {
         Map<String, Object> root = new HashMap();
         Map<String, Object> params = new HashMap();
         root.put(DataReader.ROOT_NAME, params);
@@ -44,11 +40,5 @@ public class PostFormBody implements ParamGet, Request {
         }
         return root;
     }
-
-    @Override
-    public void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
-
-    }
-
 
 }

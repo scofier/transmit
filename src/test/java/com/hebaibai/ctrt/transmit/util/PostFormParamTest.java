@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PostFormBodyTest {
+public class PostFormParamTest {
 
     @Test
     public void name() {
@@ -21,5 +21,10 @@ public class PostFormBodyTest {
             }
         }
         System.out.println(map);
+    }
+
+    @Test
+    public void post() {
+
     }
 }
