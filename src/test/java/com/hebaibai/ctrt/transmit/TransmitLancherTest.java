@@ -1,8 +1,6 @@
 package com.hebaibai.ctrt.transmit;
 
 import com.hebaibai.ctrt.CtrtLancher;
-import com.hebaibai.ctrt.transmit.router.XmlToJsonTransmitRouterImpl;
-import com.hebaibai.ctrt.transmit.router.XmlToXmlTransmitRouterImpl;
 import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
@@ -26,21 +24,37 @@ public class TransmitLancherTest {
         CtrtLancher ctrtLancher = new CtrtLancher();
         Config config = new Config();
         config.setPort(9090);
-
-        config.put(new XmlToXmlTransmitRouterImpl() {{
-            reqPath("/xmlToxml");
-            reqFile(new File("/home/hjx/work/myProject/transmit/file/req-xml.ftl"));
-
-            relayPath("http://127.0.0.1:8891/test/xml");
-            relayFile(new File("/home/hjx/work/myProject/transmit/file/relay-xml.ftl"));
+        config.put(new TransmitConfig() {{
+            setReqPath("/json");
+            setReqMethod(HttpMethod.POST);
+            setReqType(DataType.JSON);
         }});
+        config.put(new TransmitConfig() {{
+            setReqPath("/xml");
+            setReqMethod(HttpMethod.POST);
+            setReqType(DataType.JSON);
+        }});
+        config.put(new TransmitConfig() {{
+            setReqPath("/post");
+            setReqMethod(HttpMethod.POST);
+            setReqType(DataType.FROM);
+            setResType(DataType.JSON);
 
-        config.put(new XmlToJsonTransmitRouterImpl() {{
-            reqPath("/xmlToJosn");
-            reqFile(new File("/home/hjx/work/myProject/transmit/file/req-xml.ftl"));
-
-            relayPath("http://127.0.0.1:8891/test/json");
-            relayFile(new File("/home/hjx/work/myProject/transmit/file/relay-json.ftl"));
+            setApiPath("http://127.0.0.1:8891/test/json");
+            setApiMethod(HttpMethod.POST);
+            setApiReqType(DataType.JSON);
+            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/api-req-json.ftl"));
+            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/api-res-json.ftl"));
+        }});
+        config.put(new TransmitConfig() {{
+            setReqPath("/get");
+            setReqMethod(HttpMethod.GET);
+            setReqType(DataType.QUERY);
+        }});
+        config.put(new TransmitConfig() {{
+            setReqPath("/text");
+            setReqMethod(HttpMethod.POST);
+            setReqType(DataType.TEXT);
         }});
 
         ctrtLancher.start(config);

@@ -2,14 +2,15 @@ package com.hebaibai.crtr.test;
 
 import com.alibaba.fastjson.JSONObject;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.ext.web.Router;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 数据转换提供的接口
@@ -21,11 +22,12 @@ public class Main extends AbstractVerticle {
         Router router = Router.router(vertx);
 
         router.post("/test/xml").handler(event -> {
-            event.request().bodyHandler(body -> {
-                event.request().response().end("<xml>" +
-                        "<status>" + new Random().nextInt() + "</status>" +
-                        "<result>" + UUID.randomUUID().toString() + "</result>" +
-                        "</xml>");
+
+            HttpServerRequest request = event.request();
+            request.setExpectMultipart(true);
+            request.endHandler(v -> {
+                MultiMap formAttributes = event.request().formAttributes();
+                event.request().response().end(formAttributes.toString());
             });
         });
 

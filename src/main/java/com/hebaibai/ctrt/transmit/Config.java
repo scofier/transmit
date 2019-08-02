@@ -1,10 +1,11 @@
 package com.hebaibai.ctrt.transmit;
 
-import com.hebaibai.ctrt.transmit.router.TransmitRouter;
+import io.vertx.core.http.HttpMethod;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class Config {
@@ -17,17 +18,27 @@ public class Config {
      * 请求方式 对应数据转换
      */
     @Getter
-    private Set<TransmitRouter> routers = new HashSet();
+    private Set<TransmitConfig> routers = new HashSet();
 
     /**
      * 添加对应关系
      *
-     * @param router
+     * @param data
      * @return
      */
-    public boolean put(TransmitRouter router) {
-        routers.add(router);
-        return true;
+    public void put(TransmitConfig data) {
+        routers.add(data);
+    }
+
+    public TransmitConfig get(HttpMethod method, String path) {
+        Iterator<TransmitConfig> iterator = routers.iterator();
+        while (iterator.hasNext()) {
+            TransmitConfig next = iterator.next();
+            if (next.getReqMethod() == method && next.getReqPath().equals(path)) {
+                return next;
+            }
+        }
+        return null;
     }
 
 }
