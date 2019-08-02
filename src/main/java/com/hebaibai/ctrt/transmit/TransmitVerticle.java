@@ -139,7 +139,7 @@ public class TransmitVerticle extends AbstractVerticle {
         //更新body中的值
         routerVo.setBody(resBody);
         //取响应参数 和 转换 按照Post形式(从 body 中解析)
-        ParamGet paramGet = CrtrFactory.paramGet(HttpMethod.POST, transmitConfig.getResType());
+        ParamGet paramGet = CrtrFactory.paramGet(HttpMethod.POST, transmitConfig.getApiResType());
         Convert reqConvert = CrtrFactory.convert(HttpMethod.POST, transmitConfig.getResType());
         Map<String, Object> map = paramGet.get(routerVo);
         log.info("response {} befor: {}", routerVo.getUuid(), map);

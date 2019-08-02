@@ -22,4 +22,9 @@ public class PostFormBodyTest {
         }
         System.out.println(map);
     }
+
+    @Test
+    public void post() {
+
+    }
 }

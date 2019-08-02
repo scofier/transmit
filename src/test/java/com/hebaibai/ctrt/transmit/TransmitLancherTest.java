@@ -40,11 +40,12 @@ public class TransmitLancherTest {
             setReqType(DataType.FROM);
             setResType(DataType.JSON);
 
-            setApiPath("http://127.0.0.1:8891/test/json");
+            setApiPath("http://127.0.0.1:8080/post");
             setApiMethod(HttpMethod.POST);
-            setApiReqType(DataType.JSON);
-            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/api-req-json.ftl"));
-            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/api-res-json.ftl"));
+            setApiReqType(DataType.FROM);
+            setApiResType(DataType.JSON);
+            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/post-req.ftl"));
+            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/post-res.ftl"));
         }});
         config.put(new TransmitConfig() {{
             setReqPath("/get");

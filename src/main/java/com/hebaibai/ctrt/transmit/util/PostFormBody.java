@@ -1,5 +1,7 @@
 package com.hebaibai.ctrt.transmit.util;
 
+import com.hebaibai.ctrt.convert.FreeMarkerFtl;
+import com.hebaibai.ctrt.convert.FreeMarkerUtils;
 import com.hebaibai.ctrt.convert.reader.DataReader;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.RouterVo;
@@ -17,7 +19,7 @@ import java.util.Map;
 /**
  * @author hjx
  */
-public class PostFormBody implements ParamGet, Request {
+public class PostFormBody implements ParamGet, Request, Convert {
 
     @Override
     public boolean support(HttpMethod method, DataType dataType) {
@@ -47,8 +49,18 @@ public class PostFormBody implements ParamGet, Request {
 
     @Override
     public void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
-
+        client.requestAbs(HttpMethod.POST, path)
+                .putHeader(CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .sendBuffer(Buffer.buffer(param), handler);
     }
 
 
+    @Override
+    public String convert(Map<String, Object> objectMap, String ftl, String ftlName) throws Exception {
+        String format = FreeMarkerUtils.format(objectMap, new FreeMarkerFtl() {{
+            setTemplateName(ftlName);
+            setTemplateText(ftl);
+        }});
+        return format;
+    }
 }
