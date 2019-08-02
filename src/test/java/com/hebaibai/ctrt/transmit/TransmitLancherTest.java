@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt.transmit;
 
 import com.hebaibai.ctrt.CtrtLancher;
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
@@ -25,6 +26,7 @@ public class TransmitLancherTest {
         Config config = new Config();
         config.setPort(9090);
         config.put(new TransmitConfig() {{
+            setCode("text-post");
             //路由地址
             setReqPath("/post");
             //路由地址请求方式
@@ -43,9 +45,9 @@ public class TransmitLancherTest {
             //转发接口响应参数类型 JSON
             setApiResType(DataType.JSON);
             //转发接口请求参数转换模板
-            setApiReqFtl(new File("/home/hjx/work/myProject/transmit/file/post-req.ftl"));
+            setApiReqFtlText(CrtrUtils.getFileText("/home/hjx/work/myProject/transmit/file/post-req.ftl"));
             //转发接口响应参数转换模板
-            setApiResFtl(new File("/home/hjx/work/myProject/transmit/file/post-res.ftl"));
+            setApiResFtlText(CrtrUtils.getFileText("/home/hjx/work/myProject/transmit/file/post-res.ftl"));
         }});
         config.put(new TransmitConfig() {{
             setReqPath("/json");

@@ -12,10 +12,16 @@ import com.hebaibai.ctrt.transmit.util.request.PostJsonRequest;
 import com.hebaibai.ctrt.transmit.util.request.PostXmlRequest;
 import io.vertx.core.http.HttpMethod;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-public class CrtrFactory {
+public class CrtrUtils {
+
+    public static final String CHARSET_NAME = "utf-8";
 
     private static final List<Param> PARAM_LIST = Arrays.asList(
             new GetRequestParam(),
@@ -59,4 +65,16 @@ public class CrtrFactory {
         }
         return null;
     }
+
+    public static String getFileText(String path) throws IOException {
+        if (!path.startsWith("/")) {
+            path = System.getProperty("user.dir") + "/" + path;
+        }
+        File file = new File(path);
+        InputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[inputStream.available()];
+        inputStream.read(bytes);
+        return new String(bytes);
+    }
+
 }

@@ -1,10 +1,15 @@
 package com.hebaibai.ctrt.transmit;
 
 import io.vertx.core.http.HttpMethod;
+import lombok.Data;
 
-import java.io.*;
-
+@Data
 public class TransmitConfig {
+
+    /**
+     * 配置编号
+     */
+    private String code;
 
     /**
      * 请求路径
@@ -49,110 +54,12 @@ public class TransmitConfig {
     /**
      * 转发请求数据转换模板
      */
-    private File apiReqFtl;
-
-    /**
-     * 抓发响应数据转换模板
-     */
-    private File apiResFtl;
-
     private String apiReqFtlText;
 
+    /**
+     * 转发响应数据转换模板
+     */
     private String apiResFtlText;
 
-    public String getReqPath() {
-        return reqPath;
-    }
 
-    public void setReqPath(String reqPath) {
-        this.reqPath = reqPath;
-    }
-
-    public String getApiPath() {
-        return apiPath;
-    }
-
-    public void setApiPath(String apiPath) {
-        this.apiPath = apiPath;
-    }
-
-    public HttpMethod getReqMethod() {
-        return reqMethod;
-    }
-
-    public void setReqMethod(HttpMethod reqMethod) {
-        this.reqMethod = reqMethod;
-    }
-
-    public DataType getReqType() {
-        return reqType;
-    }
-
-    public void setReqType(DataType reqType) {
-        this.reqType = reqType;
-    }
-
-    public HttpMethod getApiMethod() {
-        return apiMethod;
-    }
-
-    public void setApiMethod(HttpMethod apiMethod) {
-        this.apiMethod = apiMethod;
-    }
-
-    public DataType getApiReqType() {
-        return apiReqType;
-    }
-
-    public void setApiReqType(DataType apiReqType) {
-        this.apiReqType = apiReqType;
-    }
-
-    public File getApiReqFtl() {
-        return apiReqFtl;
-    }
-
-    public void setApiReqFtl(File apiReqFtl) throws IOException {
-        this.apiReqFtl = apiReqFtl;
-        InputStream inputStream = new FileInputStream(apiReqFtl);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes);
-        this.apiReqFtlText = new String(bytes);
-    }
-
-    public File getApiResFtl() {
-        return apiResFtl;
-    }
-
-    public void setApiResFtl(File apiResFtl) throws IOException {
-        this.apiResFtl = apiResFtl;
-        InputStream inputStream = new FileInputStream(apiResFtl);
-        byte[] bytes = new byte[inputStream.available()];
-        inputStream.read(bytes);
-        this.apiResFtlText = new String(bytes);
-    }
-
-    public String getApiReqFtlText() {
-        return apiReqFtlText;
-    }
-
-    public String getApiResFtlText() {
-        return apiResFtlText;
-    }
-
-    public DataType getResType() {
-        return resType;
-    }
-
-    public void setResType(DataType resType) {
-        this.resType = resType;
-    }
-
-    public DataType getApiResType() {
-        return apiResType;
-    }
-
-    public void setApiResType(DataType apiResType) {
-        this.apiResType = apiResType;
-    }
 }

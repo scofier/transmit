@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt.transmit;
 
 import com.hebaibai.ctrt.transmit.util.Convert;
-import com.hebaibai.ctrt.transmit.util.CrtrFactory;
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.Param;
 import com.hebaibai.ctrt.transmit.util.Request;
 import io.vertx.core.AbstractVerticle;
@@ -20,9 +20,9 @@ import lombok.Setter;
 
 import java.util.Map;
 
-public class TransmitVerticle extends AbstractVerticle {
+import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
 
-    public static final String CHARSET_NAME = "utf-8";
+public class TransmitVerticle extends AbstractVerticle {
 
     private static final String RETURN_KEY = "return_key";
 
@@ -54,14 +54,16 @@ public class TransmitVerticle extends AbstractVerticle {
         router.route().handler(this::convertAndRequest);
         //转换响应数据,并发返回
         router.route().handler(this::convertAndReturn);
-
+        //开启路由
         httpServer.requestHandler(router).listen(config.getPort());
+
+        log.info("start success");
     }
 
 
     @Override
     public void stop() {
-
+        log.info("stop success");
     }
 
     /**
@@ -101,16 +103,19 @@ public class TransmitVerticle extends AbstractVerticle {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
         //接受请求的参数
-        Param param = CrtrFactory.param(routerVo.getMethod(), transmitConfig.getReqType());
-        Convert convert = CrtrFactory.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
+        Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
+        Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
         Map<String, Object> map = param.params(routerVo);
         log.info("request {} befor: {}", routerVo.getUuid(), map);
         try {
             //转换请求参数,使其符合目标接口
-            String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getApiReqFtl().getName());
+            String value = convert.convert(map,
+                    transmitConfig.getApiReqFtlText(),
+                    transmitConfig.getCode() + "REQ"
+            );
             log.info("request {} after: {}", routerVo.getUuid(), value);
             //转发数据
-            Request request = CrtrFactory.request(transmitConfig.getApiMethod(), transmitConfig.getApiReqType());
+            Request request = CrtrUtils.request(transmitConfig.getApiMethod(), transmitConfig.getApiReqType());
             request.request(webClient, value, transmitConfig.getApiPath(), event -> {
                 if (!event.succeeded()) {
                     routingContext.response().end(event.cause().getMessage());
@@ -139,12 +144,15 @@ public class TransmitVerticle extends AbstractVerticle {
         //更新body中的值
         routerVo.setBody(resBody);
         //取响应参数 和 转换 按照Post形式(从 body 中解析)
-        Param param = CrtrFactory.param(HttpMethod.POST, transmitConfig.getApiResType());
-        Convert convert = CrtrFactory.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
+        Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
+        Convert convert = CrtrUtils.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
         Map<String, Object> map = param.params(routerVo);
         log.info("response {} befor: {}", routerVo.getUuid(), map);
         try {
-            String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getApiResFtl().getName());
+            String value = convert.convert(map,
+                    transmitConfig.getApiResFtlText(),
+                    transmitConfig.getCode() + "RES"
+            );
             log.info("response {} after: {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value);
