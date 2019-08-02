@@ -2,7 +2,7 @@ package com.hebaibai.ctrt.transmit;
 
 import com.hebaibai.ctrt.transmit.util.Convert;
 import com.hebaibai.ctrt.transmit.util.CrtrFactory;
-import com.hebaibai.ctrt.transmit.util.ParamGet;
+import com.hebaibai.ctrt.transmit.util.Param;
 import com.hebaibai.ctrt.transmit.util.Request;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
@@ -101,12 +101,12 @@ public class TransmitVerticle extends AbstractVerticle {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
         //接受请求的参数
-        ParamGet paramGet = CrtrFactory.paramGet(routerVo.getMethod(), transmitConfig.getReqType());
-        Map<String, Object> map = paramGet.get(routerVo);
+        Param param = CrtrFactory.param(routerVo.getMethod(), transmitConfig.getReqType());
+        Convert convert = CrtrFactory.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
+        Map<String, Object> map = param.params(routerVo);
         log.info("request {} befor: {}", routerVo.getUuid(), map);
         try {
             //转换请求参数,使其符合目标接口
-            Convert convert = CrtrFactory.convert(routerVo.getMethod(), transmitConfig.getApiReqType());
             String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getApiReqFtl().getName());
             log.info("request {} after: {}", routerVo.getUuid(), value);
             //转发数据
@@ -139,12 +139,12 @@ public class TransmitVerticle extends AbstractVerticle {
         //更新body中的值
         routerVo.setBody(resBody);
         //取响应参数 和 转换 按照Post形式(从 body 中解析)
-        ParamGet paramGet = CrtrFactory.paramGet(HttpMethod.POST, transmitConfig.getApiResType());
-        Convert reqConvert = CrtrFactory.convert(HttpMethod.POST, transmitConfig.getResType());
-        Map<String, Object> map = paramGet.get(routerVo);
+        Param param = CrtrFactory.param(HttpMethod.POST, transmitConfig.getApiResType());
+        Convert convert = CrtrFactory.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
+        Map<String, Object> map = param.params(routerVo);
         log.info("response {} befor: {}", routerVo.getUuid(), map);
         try {
-            String value = reqConvert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getApiResFtl().getName());
+            String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getApiResFtl().getName());
             log.info("response {} after: {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value);

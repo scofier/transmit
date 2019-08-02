@@ -1,18 +1,23 @@
 package com.hebaibai.ctrt.transmit.util;
 
+import com.hebaibai.ctrt.transmit.DataType;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
-public interface Request extends Support {
+public interface Request {
 
     String CONTENT_TYPE = "Content-Type";
 
+    boolean support(HttpMethod method, DataType dataType);
+
     /**
      * 发起请求
-     *  @param client
+     *
+     * @param client
      * @param param
      * @param path
      * @param handler
