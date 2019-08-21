@@ -1,5 +1,6 @@
 package com.hebaibai.ctrt.transmit.util.param;
 
+import com.hebaibai.ctrt.convert.reader.DataReader;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.RouterVo;
 import com.hebaibai.ctrt.transmit.util.Param;
@@ -20,6 +21,7 @@ public class GetRequestParam implements Param {
     @SuppressWarnings("Duplicates")
     @Override
     public Map<String, Object> params(RouterVo routerVo) {
+        Map<String, Object> root = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         MultiMap params = routerVo.getParams();
         List<Map.Entry<String, String>> entries = params.entries();
@@ -28,7 +30,8 @@ public class GetRequestParam implements Param {
             String value = entry.getValue();
             map.put(key, value);
         }
-        return map;
+        root.put(DataReader.ROOT_NAME, map);
+        return root;
     }
 
 }
