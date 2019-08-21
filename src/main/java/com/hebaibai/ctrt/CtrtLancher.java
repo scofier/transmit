@@ -26,6 +26,5 @@ public class CtrtLancher {
                 verticleIds.add(res.result());
             }
         });
-
     }
 }

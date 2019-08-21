@@ -5,7 +5,6 @@ import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,44 +29,24 @@ public class TransmitLancherTest {
             //路由地址
             setReqPath("/post");
             //路由地址请求方式
-            setReqMethod(HttpMethod.POST);
+            setReqMethod(HttpMethod.GET);
             //入参类型 表单提交
-            setReqType(DataType.FROM);
+            setReqType(DataType.QUERY);
             //出参类型 json
             setResType(DataType.JSON);
             //=========================================
             //转发接口地址
-            setApiPath("http://127.0.0.1:8080/post");
+            setApiPath("http://47.98.105.202:9003/api/transit");
             //转发接口请求方式 POST
             setApiMethod(HttpMethod.POST);
             //转发接口请求参数类型 表单
-            setApiReqType(DataType.FROM);
+            setApiReqType(DataType.XML);
             //转发接口响应参数类型 JSON
-            setApiResType(DataType.JSON);
+            setApiResType(DataType.XML);
             //转发接口请求参数转换模板
             setApiReqFtlText(CrtrUtils.getFileText("/home/hjx/work/myProject/transmit/file/post-req.ftl"));
             //转发接口响应参数转换模板
             setApiResFtlText(CrtrUtils.getFileText("/home/hjx/work/myProject/transmit/file/post-res.ftl"));
-        }});
-        config.put(new TransmitConfig() {{
-            setReqPath("/json");
-            setReqMethod(HttpMethod.POST);
-            setReqType(DataType.JSON);
-        }});
-        config.put(new TransmitConfig() {{
-            setReqPath("/xml");
-            setReqMethod(HttpMethod.POST);
-            setReqType(DataType.JSON);
-        }});
-        config.put(new TransmitConfig() {{
-            setReqPath("/params");
-            setReqMethod(HttpMethod.GET);
-            setReqType(DataType.QUERY);
-        }});
-        config.put(new TransmitConfig() {{
-            setReqPath("/text");
-            setReqMethod(HttpMethod.POST);
-            setReqType(DataType.TEXT);
         }});
 
         ctrtLancher.start(config);

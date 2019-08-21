@@ -1,0 +1,18 @@
+{
+  "test": {
+    "request": {
+      "path": "/post",
+      "method": "GET",
+      "request-type": "FROM",
+      "response-type": "JSON"
+    },
+    "api": {
+      "url": "http://127.0.0.1:8080/post",
+      "method": "GET",
+      "request-type": "FROM",
+      "response-type": "JSON",
+      "request-ftl": "/home/hjx/work/myProject/transmit/file/post-req.ftl",
+      "response-ftl": "/home/hjx/work/myProject/transmit/file/post-res.ftl"
+    }
+  }
+}

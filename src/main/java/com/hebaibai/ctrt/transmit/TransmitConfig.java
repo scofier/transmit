@@ -12,6 +12,11 @@ public class TransmitConfig {
     private String code;
 
     /**
+     * 签名编号
+     */
+    private String signCode;
+
+    /**
      * 请求路径
      */
     private String reqPath;
