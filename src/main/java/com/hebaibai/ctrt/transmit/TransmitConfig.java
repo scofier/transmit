@@ -66,5 +66,4 @@ public class TransmitConfig {
      */
     private String apiResFtlText;
 
-
 }

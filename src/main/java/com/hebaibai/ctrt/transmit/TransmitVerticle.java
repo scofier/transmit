@@ -123,14 +123,14 @@ public class TransmitVerticle extends AbstractVerticle {
         Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
         Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
         Map<String, Object> map = param.params(routerVo);
-        log.info("request {} befor: {}", routerVo.getUuid(), map);
+        log.info("request {} befor:\n {}", routerVo.getUuid(), map);
         try {
             //转换请求参数,使其符合目标接口
             String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "REQ");
             //签名
             Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
             value = sign.sign(value);
-            log.info("request {} after: {}", routerVo.getUuid(), value);
+            log.info("request {} after:\n {}", routerVo.getUuid(), value);
             //转发数据
             Request request = CrtrUtils.request(transmitConfig.getApiMethod(), transmitConfig.getApiReqType());
             request.request(webClient, value, transmitConfig.getApiPath(), event -> {
@@ -144,7 +144,7 @@ public class TransmitVerticle extends AbstractVerticle {
                 routingContext.next();
             });
         } catch (Exception e) {
-            log.error("request " + routerVo.getUuid() + " error: {}", e);
+            log.error("request " + routerVo.getUuid() + " error:\n {}", e);
             routingContext.fail(e);
         }
     }
@@ -160,23 +160,23 @@ public class TransmitVerticle extends AbstractVerticle {
         String resBody = routingContext.get(RETURN_KEY);
         //更新body中的值
         routerVo.setBody(resBody);
+        log.info("response {} befor:\n {}", routerVo.getUuid(), resBody);
+        //验签
+        Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
+        boolean verify = sign.verify(resBody);
         //取响应参数 和 转换 按照Post形式(从 body 中解析)
         Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
         Convert convert = CrtrUtils.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
         Map<String, Object> map = param.params(routerVo);
-        //验签
-        Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
-        boolean verify = sign.verify(map);
         //在参数中添加签名是否验证成功的标示, 以便在模板文件中查看
         map.put(VERIFY_KEY, verify ? VERIFY_SUCCESS : VERIFY_ERROR);
-        log.info("response {} befor: {}", routerVo.getUuid(), map);
         try {
             String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "RES");
-            log.info("response {} after: {}", routerVo.getUuid(), value);
+            log.info("response {} after:\n {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value);
         } catch (Exception e) {
-            log.error("request " + routerVo.getUuid() + " error: {}", e);
+            log.error("request " + routerVo.getUuid() + " error:\n {}", e);
             routingContext.fail(e);
         }
     }

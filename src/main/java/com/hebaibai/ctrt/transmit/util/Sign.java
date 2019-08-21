@@ -27,5 +27,5 @@ public interface Sign {
      * @param value
      * @return
      */
-    boolean verify(Map<String, Object> value);
+    boolean verify(String value);
 }

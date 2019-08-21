@@ -36,7 +36,7 @@ public class TransmitLancherTest {
             setResType(DataType.JSON);
             //=========================================
             //转发接口地址
-            setApiPath("http://47.98.105.202:9003/api/transit");
+            setApiPath("http://127.0.0.1:9003/api/transit");
             //转发接口请求方式 POST
             setApiMethod(HttpMethod.POST);
             //转发接口请求参数类型 表单

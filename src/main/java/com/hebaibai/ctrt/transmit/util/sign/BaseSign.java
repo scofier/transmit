@@ -1,7 +1,6 @@
 package com.hebaibai.ctrt.transmit.util.sign;
 
 import com.hebaibai.ctrt.transmit.util.Sign;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class BaseSign implements Sign {
     }
 
     @Override
-    public boolean verify(Map<String, Object> value) {
+    public boolean verify(String value) {
         return true;
     }
 }
