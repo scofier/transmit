@@ -32,12 +32,12 @@
             <Insureds>
                 <#list ROOT.insureds as insured>
                     <Insured>
+                        <InsuredSeqNo>${insured_index+1}</InsuredSeqNo>
                         <InsuredName>${insured.name}</InsuredName>
                         <InsuredIdType>${insured.cardType}</InsuredIdType>
                         <InsuredIdNo>${insured.cardNo}</InsuredIdNo>
-                        <InsuredIdMobile>${insured.mobile}</InsuredIdMobile>
-                        <InsuredEmail>${insured.email}</InsuredEmail>
-                        <InsuredAddress>${insured.address}</InsuredAddress>
+                        <InsuredBirthday>${insured.birthday}</InsuredBirthday>
+                        <InsuredSex>1</InsuredSex>
                     </Insured>
                 </#list>
             </Insureds>
