@@ -22,7 +22,7 @@
       "signCode": "PICC_XM",
       "method": "POST",
       "request-type": "XML",
-      "response-type": "TEXT",
+      "response-type": "XML",
       "request-ftl": "file/PICC/JAH-transit-send.ftl",
       "response-ftl": "file/PICC/JAH-transit-result.ftl"
     }
@@ -40,7 +40,7 @@
       "signCode": "PICC_XM",
       "method": "POST",
       "request-type": "XML",
-      "response-type": "TEXT",
+      "response-type": "XML",
       "request-ftl": "file/PICC/EAK-transit-send.ftl",
       "response-ftl": "file/PICC/EAK-transit-result.ftl"
     }
