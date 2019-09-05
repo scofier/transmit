@@ -37,7 +37,7 @@ public class Regular implements TemplateDirectiveModel {
         }
 
         if (params == null) {
-            throw new RuntimeException("指令: @regular 缺少 pattern/value");
+            throw new RuntimeException("指令: @regular 缺少 pattern");
         }
 
         Object pattern = params.get(PATTERN_KEY);
