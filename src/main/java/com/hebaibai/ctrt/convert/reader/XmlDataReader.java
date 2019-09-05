@@ -16,6 +16,7 @@ import java.util.Map;
 
 /**
  * xml格式的报文解析
+ * @author hjx
  */
 public class XmlDataReader extends AbstractDataReader implements DataReader {
 

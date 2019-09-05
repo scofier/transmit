@@ -7,6 +7,9 @@ import com.hebaibai.ctrt.transmit.util.Convert;
 
 import java.util.Map;
 
+/**
+ * @author hjx
+ */
 public class BaseConvert implements Convert {
 
     @Override

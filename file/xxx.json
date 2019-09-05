@@ -1,0 +1,43 @@
+{
+  "uuid": "d83a011a-958d-4310-a51b-0fb3a4228ef1",
+  "policyinfo": {
+    "serialNo": "1",
+    "riskCode": "JAH",
+    "operateTimes": "2017-11-15 16:57:36",
+    "startDate": "2018-12-28",
+    "endDate": "2019-12-27",
+    "startHour": "0",
+    "endHour": "24",
+    "sumAmount": "1.00",
+    "sumPremium": "1",
+    "arguSolution": "1",
+    "quantity": "1",
+    "rationPlan": "EAK3502001"
+  },
+  "applicant": {
+    "name": "张晓昭",
+    "type": "01",
+    "cardNo": "510231196406190012",
+    "mobile": "17631088624",
+    "email": "2652319252",
+    "address": "asdas"
+  },
+  "insureds": [
+    {
+      "name": "张晓昭",
+      "cardType": "01",
+      "cardNo": "510231196406190012",
+      "birthday": "1964-06-19",
+      "mobile": "17631088624",
+      "email": "17631088624@qq.com",
+      "address": "测试地址"
+    }
+  ],
+  "addresses": [
+    {
+      "serialNo": "1",
+      "postCode": "111111",
+      "addressName": "河北省保定"
+    }
+  ]
+}

@@ -1,18 +1,48 @@
 {
-  "test": {
+  "config": {
+    "port": 9090,
+    "db": {
+      "host": "27.150.187.31",
+      "database": "logdb",
+      "port": 3306,
+      "username": "root",
+      "password": "Fz189@!@"
+    }
+  },
+  "application-picc-jah": {
     "request": {
-      "path": "/post",
-      "method": "GET",
-      "request-type": "FROM",
+      "path": "/application/PICC/JAH",
+      "method": "POST",
+      "request-type": "JSON",
       "response-type": "JSON"
     },
     "api": {
-      "url": "http://127.0.0.1:8080/post",
-      "method": "GET",
-      "request-type": "FROM",
-      "response-type": "JSON",
-      "request-ftl": "/home/hjx/work/myProject/transmit/file/post-req.ftl",
-      "response-ftl": "/home/hjx/work/myProject/transmit/file/post-res.ftl"
+      "timeout": 50000,
+      "url": "http://47.98.105.202:9003/api/transit",
+      "signCode": "PICC_XM",
+      "method": "POST",
+      "request-type": "XML",
+      "response-type": "TEXT",
+      "request-ftl": "file/PICC/JAH-transit-send.ftl",
+      "response-ftl": "file/PICC/JAH-transit-result.ftl"
+    }
+  },
+  "application-picc-eak": {
+    "request": {
+      "path": "/application/PICC/EAK",
+      "method": "POST",
+      "request-type": "JSON",
+      "response-type": "JSON"
+    },
+    "api": {
+      "timeout": 50000,
+      "url": "http://47.98.105.202:9003/api/transit",
+      "signCode": "PICC_XM",
+      "method": "POST",
+      "request-type": "XML",
+      "response-type": "TEXT",
+      "request-ftl": "file/PICC/EAK-transit-send.ftl",
+      "response-ftl": "file/PICC/EAK-transit-result.ftl"
     }
   }
 }

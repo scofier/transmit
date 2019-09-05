@@ -14,6 +14,10 @@ public class Config {
     @Setter
     private int port;
 
+    @Getter
+    @Setter
+    private DataConfig dataConfig;
+
     /**
      * 请求方式 对应数据转换
      */

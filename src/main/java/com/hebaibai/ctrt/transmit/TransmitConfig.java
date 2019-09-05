@@ -66,4 +66,15 @@ public class TransmitConfig {
      */
     private String apiResFtlText;
 
+    /**
+     * 请求超时时间
+     */
+    private int timeout;
+
+    /**
+     * 接口调用出错重试
+     * TODO 没有实现
+     */
+    private int retries;
+
 }

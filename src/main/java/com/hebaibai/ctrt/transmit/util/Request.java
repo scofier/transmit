@@ -20,8 +20,9 @@ public interface Request {
      * @param client
      * @param param
      * @param path
+     * @param timeout
      * @param handler
      */
-    void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler);
+    void request(WebClient client, String param, String path, int timeout, Handler<AsyncResult<HttpResponse<Buffer>>> handler);
 
 }
