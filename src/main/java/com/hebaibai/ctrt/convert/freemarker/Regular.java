@@ -22,6 +22,7 @@ public class Regular implements TemplateDirectiveModel {
      * 正则
      */
     private static final String PATTERN_KEY = "pattern";
+
     /**
      * 组别, 默认是1
      */
@@ -34,17 +35,19 @@ public class Regular implements TemplateDirectiveModel {
         if (loopVars.length != 0 || body == null) {
             return;
         }
-        if (params != null && !params.containsKey(PATTERN_KEY)) {
-            throw new RuntimeException("指令: @regular pattern 不能为 null");
+
+        if (params == null) {
+            throw new RuntimeException("指令: @regular 缺少 pattern/value");
         }
+
         Object pattern = params.get(PATTERN_KEY);
         if (pattern == null) {
             throw new RuntimeException("指令: @regular pattern 不能为 null");
         }
+
         String patternStr = pattern.toString();
         Writer out = environment.getOut();
         body.render(new Writer(out) {
-
             @Override
             public void write(char[] cbuf, int off, int len) throws IOException {
                 int groupInt = 1;
@@ -52,8 +55,7 @@ public class Regular implements TemplateDirectiveModel {
                 if (group != null) {
                     groupInt = Integer.parseInt(group.toString());
                 }
-                String value = new String(cbuf);
-                String byPattern = getByPattern(value, patternStr, groupInt);
+                String byPattern = getByPattern(new String(cbuf), patternStr, groupInt);
                 out.write(byPattern);
             }
 
