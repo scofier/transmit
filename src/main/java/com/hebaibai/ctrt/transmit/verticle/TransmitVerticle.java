@@ -18,6 +18,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
  *
  * @author hjx
  */
+@Slf4j
 public class TransmitVerticle extends AbstractVerticle {
 
     /**
@@ -55,8 +57,6 @@ public class TransmitVerticle extends AbstractVerticle {
     private WebClient webClient;
 
     private EventBus eventBus;
-
-    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(TransmitVerticle.class.getName());
 
     @Override
     public void init(Vertx vertx, Context context) {
@@ -132,7 +132,7 @@ public class TransmitVerticle extends AbstractVerticle {
             return;
         }
         Map<String, Object> map = param.params(routerVo);
-        log.info("request {0} befor:\n {1}", routerVo.getUuid(), map);
+        log.info("request {} befor:\n {}", routerVo.getUuid(), map);
         String value = null;
         try {
             //转换请求参数,使其符合目标接口
@@ -140,9 +140,9 @@ public class TransmitVerticle extends AbstractVerticle {
             //签名
             Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
             value = sign.sign(value);
-            log.info("request {0} after:\n {1}", routerVo.getUuid(), value);
+            log.info("request {} after:\n {}", routerVo.getUuid(), value);
         } catch (Exception e) {
-            log.error("request {0} error:\n {1}", routerVo.getUuid(), e);
+            log.error("request {} error:\n {}", routerVo.getUuid(), e);
             routingContext.response().end(error(e));
             return;
         }
@@ -173,7 +173,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndReturn(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        log.info("response {0} befor:\n {1}", routerVo.getUuid(), routerVo.getBody());
+        log.info("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
         try {
             //验签
             Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
@@ -189,11 +189,11 @@ public class TransmitVerticle extends AbstractVerticle {
             //在参数中添加签名是否验证成功的标示, 以便在模板文件中查看
             map.put(VERIFY_KEY, verify ? VERIFY_SUCCESS : VERIFY_ERROR);
             String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "RES");
-            log.info("response {0} after:\n {1}", routerVo.getUuid(), value);
+            log.info("response {} after:\n {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value);
         } catch (Exception e) {
-            log.error("request {0} error:\n {1}", routerVo.getUuid(), e);
+            log.error("request {} error:\n {}", routerVo.getUuid(), e);
             routingContext.response().end(error(e));
         }
     }
