@@ -22,9 +22,7 @@ public class PostJsonParam implements Param {
         JsonDataReader dataReader = new JsonDataReader();
         String requestBody = routerVo.getBody();
         dataReader.read(requestBody);
-        return new HashMap() {{
-            put(DataReader.ROOT_NAME, dataReader.getRequestData());
-        }};
+        return dataReader.getRequestData();
     }
 
 }
