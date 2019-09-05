@@ -2,10 +2,9 @@
   "uuid": "d83a011a-958d-4310-a51b-0fb3a4228ef1",
   "policyinfo": {
     "serialNo": "1",
-    "riskCode": "JAH",
     "operateTimes": "2017-11-15 16:57:36",
-    "startDate": "2018-12-28",
-    "endDate": "2019-12-27",
+    "startDate": "2019-12-28",
+    "endDate": "2020-12-27",
     "startHour": "0",
     "endHour": "24",
     "sumAmount": "1.00",
