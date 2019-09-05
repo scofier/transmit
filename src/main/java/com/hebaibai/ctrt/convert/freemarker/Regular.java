@@ -56,6 +56,9 @@ public class Regular implements TemplateDirectiveModel {
                     groupInt = Integer.parseInt(group.toString());
                 }
                 String byPattern = getByPattern(new String(cbuf), patternStr, groupInt);
+                if (byPattern != null) {
+                    byPattern = byPattern.trim();
+                }
                 out.write(byPattern);
             }
 
