@@ -2,6 +2,7 @@ package com.hebaibai.ctrt;
 
 import com.alibaba.fastjson.JSONObject;
 import com.hebaibai.ctrt.transmit.Config;
+import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
@@ -15,6 +16,7 @@ import java.util.Set;
 
 /**
  * 启动器
+ *
  * @author hjx
  */
 @Slf4j
@@ -28,11 +30,19 @@ public class Main {
     public static void main(String[] args) {
         Config config = new Config();
         try {
+            //获取配置文件内容
             JSONObject jsonObject = JSONObject.parseObject(getConf(args));
-            Integer port = jsonObject.getInteger("port");
+            //获取系统配置
+            JSONObject configJson = jsonObject.getJSONObject("config");
+            //获取系统端口配置
+            Integer port = configJson.getInteger("port");
             config.setPort(port);
-            jsonObject.remove("port");
+            //移出配置文件中的config节点
+            jsonObject.remove("config");
             log.info("init port: {}", port);
+            //配置日志数据库
+            DataConfig db = configJson.getObject("db", DataConfig.class);
+            config.setDataConfig(db);
             //转发配置
             Set<String> keys = jsonObject.keySet();
             Iterator<String> iterator = keys.iterator();
@@ -50,6 +60,10 @@ public class Main {
                 //api配置
                 JSONObject api = transmitJson.getJSONObject("api");
                 transmitConfig.setApiPath(api.getString("url"));
+                transmitConfig.setSignCode(api.getString("signCode"));
+                //接口调用超时时间， 默认3秒
+                Integer timeout = (Integer) api.getOrDefault("timeout", 3000);
+                transmitConfig.setTimeout(timeout);
                 transmitConfig.setApiMethod(getHttpMethod(api));
                 transmitConfig.setApiReqType(getRequestType(api));
                 transmitConfig.setApiResType(getResponseType(api));

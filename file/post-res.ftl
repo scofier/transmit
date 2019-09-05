@@ -1,3 +1,5 @@
 {
-    "result":"${ROOT.name}@${ROOT.age}"
+    "VERIFY":${VERIFY},
+    "ErrorCode":"${ROOT.GeneralInfoReturn.ErrorCode}",
+    "ErrorMessage":"${ROOT.GeneralInfoReturn.ErrorMessage}"
 }

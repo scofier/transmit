@@ -19,7 +19,7 @@ public interface Sign {
      * @param value 完整的数据
      * @return 签名处理后的数据
      */
-    String sign(String value);
+    String sign(String value) throws Exception;
 
     /**
      * 验证签名
@@ -27,5 +27,5 @@ public interface Sign {
      * @param value
      * @return
      */
-    boolean verify(String value);
+    boolean verify(String value) throws Exception;
 }

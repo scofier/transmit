@@ -1,18 +1,29 @@
 {
-  "test": {
+  "config": {
+    "port": 9090,
+    "db": {
+      "host": "127.0.0.1",
+      "database": "dbname",
+      "port": 3306,
+      "username": "root",
+      "password": "root"
+    }
+  },
+  "test-get": {
     "request": {
-      "path": "/post",
+      "path": "/xxx",
       "method": "GET",
-      "request-type": "FROM",
-      "response-type": "JSON"
+      "request-type": "QUERY",
+      "response-type": "TEXT"
     },
     "api": {
-      "url": "http://127.0.0.1:8080/post",
+      "url": "http://127.0.0.1:9003/api/xxx",
+      "signCode": "null",
       "method": "GET",
-      "request-type": "FROM",
-      "response-type": "JSON",
-      "request-ftl": "/home/hjx/work/myProject/transmit/file/post-req.ftl",
-      "response-ftl": "/home/hjx/work/myProject/transmit/file/post-res.ftl"
+      "request-type": "QUERY",
+      "response-type": "TEXT",
+      "request-ftl": "file/post-req.ftl",
+      "response-ftl": "file/post-req.ftl"
     }
   }
 }

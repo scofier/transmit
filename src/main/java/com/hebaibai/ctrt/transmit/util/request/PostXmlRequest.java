@@ -17,9 +17,10 @@ public class PostXmlRequest implements Request {
     }
 
     @Override
-    public void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
+    public void request(WebClient client, String param, String path, int timeout, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
         client.requestAbs(HttpMethod.POST, path)
                 .putHeader(CONTENT_TYPE, "application/xml")
+                .timeout(timeout)
                 .sendBuffer(Buffer.buffer(param), handler);
     }
 

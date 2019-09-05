@@ -2,14 +2,8 @@ package com.hebaibai.ctrt.transmit.util;
 
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.util.convert.BaseConvert;
-import com.hebaibai.ctrt.transmit.util.param.GetRequestParam;
-import com.hebaibai.ctrt.transmit.util.param.PostFormParam;
-import com.hebaibai.ctrt.transmit.util.param.PostJsonParam;
-import com.hebaibai.ctrt.transmit.util.param.PostXmlParam;
-import com.hebaibai.ctrt.transmit.util.request.GetRequest;
-import com.hebaibai.ctrt.transmit.util.request.PostFormRequest;
-import com.hebaibai.ctrt.transmit.util.request.PostJsonRequest;
-import com.hebaibai.ctrt.transmit.util.request.PostXmlRequest;
+import com.hebaibai.ctrt.transmit.util.param.*;
+import com.hebaibai.ctrt.transmit.util.request.*;
 import com.hebaibai.ctrt.transmit.util.sign.BaseSign;
 import io.vertx.core.http.HttpMethod;
 
@@ -32,6 +26,7 @@ public class CrtrUtils {
             new GetRequestParam(),
             new PostFormParam(),
             new PostJsonParam(),
+            new PostTextParam(),
             new PostXmlParam()
     );
     /**
@@ -41,8 +36,10 @@ public class CrtrUtils {
             new GetRequest(),
             new PostFormRequest(),
             new PostJsonRequest(),
+            new PostTextRequest(),
             new PostXmlRequest()
     );
+
     /**
      * 参数转换工具
      */

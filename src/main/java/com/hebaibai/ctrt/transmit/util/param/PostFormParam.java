@@ -17,7 +17,7 @@ public class PostFormParam implements Param {
 
     @Override
     public boolean support(HttpMethod method, DataType dataType) {
-        return method == HttpMethod.POST && dataType == DataType.FROM;
+        return method == HttpMethod.POST && dataType == DataType.FORM;
     }
 
     @Override

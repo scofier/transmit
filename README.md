@@ -7,213 +7,61 @@
 
 ## 示例
 
-### josn to json
-
-1.  转换代码
-
-    ```java
-    DataReader dataReader = new JsonDataReader();
-    //读取数据
-    dataReader.read("json 格式数据");
-    //设置模板
-    FreeMarkerFtl freeMarkerFtl = new FreeMarkerFtl();
-    freeMarkerFtl.setTemplateName("模板名称");
-    freeMarkerFtl.setTemplateText("模板数据");
-    //转换结果
-    String res = dataReader.converterFormat(freeMarkerFtl);
-    ```
-
-2.  模板
-
-    ```xml
-    {
-      "uuid": "${uuid}",
-      "p-sex": "${people.sex}",
-      "p-name": "${people.name}",
-      "list": [
-    <#list people.people as obj>
-        {
-          "c-name": "${obj.name}",
-          "c-age": "${obj.age}",
-          "c-sex": "${obj.sex}"
-        }<#if obj_has_next>,</#if>
-    </#list>
-      ]
+## 配置说明
+```
+{
+  系统的端口号
+  "port": 9090, 
+  
+  配置示例
+  "config-demo": {
+  
+    接受请求
+    "request": {
+    
+      接受请求的地址 127.0.0.1:9090/downloadPolicy
+      "path": "/downloadPolicy",
+      
+      请求的方式
+      "method": "GET",
+      
+      请求参数类型: FORM(表单提交),  JSON(json),  QUERY(?key=value&key2=value),  TEXT(文本),  XML(xml),
+      "request-type": "QUERY",
+      
+      返回参数类型
+      "response-type": "TEXT"
+    },
+    
+    转发的接口配置
+    "api": {
+    
+      接口请求地址
+      "url": "http://47.98.105.202:9003/api/downloadPolicyUrl",
+      
+      接口签名编号(需要手动实现)
+      "signCode": "null",
+      
+      接口请求地址
+      "method": "GET",
+      
+      请求参数类型
+      "request-type": "QUERY",
+      
+      请求超时设置,默认3000 ms, 单位ms
+      "timeout": 1,
+      
+      返回参数类型
+      "response-type": "TEXT",
+      
+      请求参数转换模板
+      "request-ftl": "/home/hjx/work/myProject/transmit/file/downloadPolicy-req.ftl",
+      
+      响应参数转换模板
+      "response-ftl": "/home/hjx/work/myProject/transmit/file/downloadPolicy-res.ftl"
     }
-    ```
-
-3.  数据 
-
-    ```json
-    {
-      "uuid": "123456789032sdfgh",
-      "people": {
-        "sex": "男",
-        "age": "20",
-        "name": "王麻子",
-        "people": [
-          {
-            "sex": "女",
-            "age": "18",
-            "name": "李傻子"
-          },
-          {
-            "sex": "男",
-            "age": "21",
-            "name": "王大锤"
-          }
-        ]
-      }
-    }
-    ```
-
-4.   结果
-
-     ```json
-     {
-         "uuid":"123456789032sdfgh",
-         "p-sex":"男",
-         "p-name":"王麻子",
-         "list":[
-             {
-                 "c-name":"李傻子",
-                 "c-age":"18",
-                 "c-sex":"女"
-             },
-             {
-                 "c-name":"王大锤",
-                 "c-age":"21",
-                 "c-sex":"男"
-             }
-         ]
-     }
-     ```
-
-
-     ​    
-
-###  json to xml
-
-1.  只需要修改模板即可
-
-    ```xml
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <xml>
-        <uuid>${uuid}</uuid>
-        <p-sex>${people.sex}</p-sex>
-        <p-name>${people.name}</p-name>
-    <#list people.people as obj>
-            <list>
-                <c-name>${obj.name}</c-name>
-                <c-age>${obj.age}</c-age>
-                <c-sex>${obj.sex}</c-sex>
-            </list>
-    </#list>
-    </xml>
-    
-    ```
-
-    
-
-### xml to xml
-
-1.  转换代码
-
-    ```java
-    DataReader dataReader = new XmlDataReader();
-    //读取数据
-    dataReader.read("xml 格式数据");
-    //设置模板
-    FreeMarkerFtl freeMarkerFtl = new FreeMarkerFtl();
-    freeMarkerFtl.setTemplateName("模板名称");
-    freeMarkerFtl.setTemplateText("模板数据");
-    //转换结果
-    String res = dataReader.converterFormat(freeMarkerFtl);
-    ```
-
-2.  模板
-
-    ```xml
-    <xml>
-        <uuid>${uuid}</uuid>
-        <p-sex>${people.sex}</p-sex>
-        <p-name>${people.name}</p-name>
-    <#list people.people as obj>
-            <list>
-                <c-name>${obj.name}</c-name>
-                <c-age>${obj.age}</c-age>
-                <c-sex>${obj.sex}</c-sex>
-            </list>
-    </#list>
-    </xml>
-    ```
-
-3. 数据
-
-   ```xml
-   <xml>
-       <uuid>123456789032sdfgh</uuid>
-       <people>
-           <sex>男</sex>
-           <age>20</age>
-           <name>王麻子</name>
-           <people>
-               <sex>女</sex>
-               <age>18</age>
-               <name>李傻子</name>
-           </people>
-           <people>
-               <sex>男</sex>
-               <age>20</age>
-               <name>王大锤</name>
-           </people>
-       </people>
-   </xml>
-   ```
-
-4.  结果
-
-    ```xml
-    <?xml version="1.0" encoding="utf-8"?>
-    
-    <xml> 
-      <uuid>123456789032sdfgh</uuid>  
-      <p-sex>男</p-sex>  
-      <p-name>王麻子</p-name>  
-      <list> 
-        <c-name>李傻子</c-name>  
-        <c-age>18</c-age>  
-        <c-sex>女</c-sex> 
-      </list>  
-      <list> 
-        <c-name>王大锤</c-name>  
-        <c-age>20</c-age>  
-        <c-sex>男</c-sex> 
-      </list>
-    </xml>
-    
-    ```
-
-### xml to json
-
-1.  修改模板即可
-
-    ```xml
-    {
-      "uuid": "${uuid}",
-      "p-sex": "${people.sex}",
-      "p-name": "${people.name}",
-      "list": [
-    <#list people.people as obj>
-        {
-          "c-name": "${obj.name}",
-          "c-age": "${obj.age}",
-          "c-sex": "${obj.sex}"
-        }<#if obj_has_next>,</#if>
-    </#list>
-      ]
-    }
-    ```
+  }
+}
+```
 
     
 

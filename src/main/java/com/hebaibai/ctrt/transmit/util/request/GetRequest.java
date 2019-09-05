@@ -6,6 +6,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
@@ -17,7 +18,14 @@ public class GetRequest implements Request {
     }
 
     @Override
-    public void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
-        client.getAbs(path).sendBuffer(Buffer.buffer(param), handler);
+    public void request(WebClient client, String param, String path, int timeout, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
+        HttpRequest<Buffer> request = null;
+        if (param.endsWith("?")) {
+            request = client.requestAbs(HttpMethod.GET, path + param);
+        } else {
+            request = client.requestAbs(HttpMethod.GET, path + "?" + param);
+        }
+        request.timeout(timeout).send(handler);
+
     }
 }

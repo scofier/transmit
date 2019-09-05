@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt.transmit;
 
 public enum DataType {
-    FROM,
+    FORM,
     JSON,
     QUERY,
     TEXT,

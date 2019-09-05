@@ -16,13 +16,14 @@ public class PostFormRequest implements Request {
 
     @Override
     public boolean support(HttpMethod method, DataType dataType) {
-        return method == HttpMethod.POST && dataType == DataType.FROM;
+        return method == HttpMethod.POST && dataType == DataType.FORM;
     }
 
     @Override
-    public void request(WebClient client, String param, String path, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
+    public void request(WebClient client, String param, String path, int timeout, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
         client.requestAbs(HttpMethod.POST, path)
                 .putHeader(CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .timeout(timeout)
                 .sendBuffer(Buffer.buffer(param), handler);
     }
 }
