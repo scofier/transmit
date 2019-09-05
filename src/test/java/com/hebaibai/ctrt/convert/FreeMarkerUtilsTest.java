@@ -10,10 +10,10 @@ public class FreeMarkerUtilsTest {
     public void name() throws Exception {
 
         System.out.println(FreeMarkerUtils.format(new HashMap() {{
-            put("name", "<xml>你好啊<xml>哈哈<xml>");
+            put("name", "<xml>你好啊<xml>");
         }}, new FreeMarkerFtl() {{
             setTemplateName("test");
-            setTemplateText("<@regular pattern='<xml>(.*)<xml>(.*)<xml>'  >${name}</@regular>");
+            setTemplateText("===<@regular pattern='<xml>(.*)<xml>'>${name}</@regular>===");
         }}));
     }
 }
