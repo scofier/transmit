@@ -198,6 +198,7 @@ public class TransmitVerticle extends AbstractVerticle {
 
     /**
      * 获取异常中的信息
+     *
      * @param throwable
      * @return
      */
