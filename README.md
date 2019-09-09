@@ -13,6 +13,67 @@
 
 开发框架使用vert.x
 
+## 使用说明
+
+#### 打包命令
+```bash
+clean package -D skipTests dependency:copy-dependencies -DoutputDirectory=./target/lib -f pom.xml
+```
+
+#### 文件目录
+```
+.
+├── config 参数转换模板文件
+│   └── XXXX
+│       ├── JAH-transit-result.json
+│       └── JAH-transit-send.xml
+│
+├── config.json 项目启动要加载的配置
+│
+├── lib  项目打包后的文件
+│   └── vertx-web-common-3.8.0.jar
+│   └── ....
+│
+├── log  日志
+│   ├── error  
+│   │   └── error.2019-09-09.log
+│   └── info   
+│       └── info.2019-09-09.log
+│
+└── start.sh  启动脚本
+
+```
+
+#### 启动脚本
+
+```bash
+#!/bin/bash
+
+# 项目路径
+DEPLOY_DIR=`pwd`
+CONF_DIR=$DEPLOY_DIR/conf
+echo $CONF_DIR
+
+# lib
+LIB_DIR=$DEPLOY_DIR/lib
+LIB_JARS=`ls $LIB_DIR|grep .jar|awk '{print "'$LIB_DIR'/"$0}'|tr "\n" ":"`
+
+# 依赖的 lib
+JAVA_OPTS=" -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true "
+JAVA_MEM_OPTS=""
+BITS=`java -version 2>&1 | grep -i 64-bit`
+if [ -n "$BITS" ]; then
+    JAVA_MEM_OPTS=" -server -Xmx512m -Xmx512m -Xmn128m -XX:PermSize=128m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
+else
+    JAVA_MEM_OPTS=" -server -Xms1g -Xmx1g -XX:PermSize=128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
+fi
+
+# 启动命令
+java $JAVA_OPTS $JAVA_MEM_OPTS -classpath $CONF_DIR:$LIB_JARS com.hebaibai.ctrt.Main -c config.json
+```
+
+
+
 ## 配置说明
 ```
 {
@@ -22,6 +83,11 @@
     
     系统端口号
     "port": 9090,
+    
+    其他组件加载, 执行CLass.forName
+    "ext": [
+      "com.hebaibai.ctrt.Driver"
+    ],
     
     数据库配置, 用于保存接口请求日志
     "db": {

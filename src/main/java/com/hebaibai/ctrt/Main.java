@@ -24,11 +24,6 @@ import java.util.Set;
 @Slf4j
 public class Main {
 
-    static {
-        //加载默认的签名方式
-        CrtrUtils.SIGN_LIST.add(new BaseSign());
-    }
-
     /**
      * 启动入口
      *
@@ -59,7 +54,6 @@ public class Main {
                 String code = iterator.next();
                 JSONObject transmitJson = jsonObject.getJSONObject(code);
                 TransmitConfig transmitConfig = getTransmitConfig(code, transmitJson);
-                log.info("init transmitConfig: {}", transmitConfig);
                 //加入配置
                 config.put(transmitConfig);
             }
@@ -119,10 +113,12 @@ public class Main {
         JSONArray ext = configJson.getJSONArray("ext");
         for (int i = 0; i < ext.size(); i++) {
             String extClassName = ext.getString(i);
+            log.info("load ext class {}", extClassName);
             try {
                 Class.forName(extClassName);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
+                System.exit(0);
             }
         }
     }

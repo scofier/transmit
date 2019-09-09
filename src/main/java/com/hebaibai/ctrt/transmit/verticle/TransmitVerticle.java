@@ -95,7 +95,7 @@ public class TransmitVerticle extends AbstractVerticle {
         TransmitConfig transmitConfig = config.get(method, path);
         //没有找到配置
         if (transmitConfig == null) {
-            routingContext.response().end(error(new RuntimeException("not find config")));
+            routingContext.response().end(error(new RuntimeException("not find config")), CHARSET_NAME);
             return;
         }
         request.bodyHandler(event -> {
@@ -126,7 +126,7 @@ public class TransmitVerticle extends AbstractVerticle {
         Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
         Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
         if (param == null || convert == null) {
-            routingContext.response().end(error(new RuntimeException("config error")));
+            routingContext.response().end(error(new RuntimeException("config error")), CHARSET_NAME);
             return;
         }
         Map<String, Object> map = param.params(routerVo);
@@ -134,21 +134,21 @@ public class TransmitVerticle extends AbstractVerticle {
         String value = null;
         try {
             //转换请求参数,使其符合目标接口
-            value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "REQ");
+            value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "-REQ");
             //签名
             Sign sign = CrtrUtils.sign(transmitConfig.getSignCode());
             value = sign.sign(value);
             log.info("request {} after:\n {}", routerVo.getUuid(), value);
         } catch (Exception e) {
             log.error("request {} error:\n {}", routerVo.getUuid(), e);
-            routingContext.response().end(error(e));
+            routingContext.response().end(error(e), CHARSET_NAME);
             return;
         }
         //转发数据
         Request request = CrtrUtils.request(transmitConfig.getApiMethod(), transmitConfig.getApiReqType());
         request.request(webClient, value, transmitConfig.getApiPath(), transmitConfig.getTimeout(), event -> {
             if (!event.succeeded()) {
-                routingContext.response().end(error(event.cause()));
+                routingContext.response().end(error(event.cause()), CHARSET_NAME);
             } else {
                 //响应数据
                 String body = event.result().bodyAsString(CHARSET_NAME);
@@ -180,19 +180,19 @@ public class TransmitVerticle extends AbstractVerticle {
             Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
             Convert convert = CrtrUtils.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
             if (param == null || convert == null) {
-                routingContext.response().end(error(new RuntimeException("config error")));
+                routingContext.response().end(error(new RuntimeException("config error")), CHARSET_NAME);
                 return;
             }
             Map<String, Object> map = param.params(routerVo);
             //在参数中添加签名是否验证成功的标示, 以便在模板文件中查看
             map.put(VERIFY_KEY, verify ? VERIFY_SUCCESS : VERIFY_ERROR);
-            String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "RES");
+            String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "-RES");
             log.info("response {} after:\n {}", routerVo.getUuid(), value);
             //返回响应结果
-            routingContext.response().end(value);
+            routingContext.response().end(value, CHARSET_NAME);
         } catch (Exception e) {
             log.error("request {} error:\n {}", routerVo.getUuid(), e);
-            routingContext.response().end(error(e));
+            routingContext.response().end(error(e), CHARSET_NAME);
         }
     }
 
