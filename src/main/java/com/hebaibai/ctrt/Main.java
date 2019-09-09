@@ -1,11 +1,13 @@
 package com.hebaibai.ctrt;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.hebaibai.ctrt.transmit.Config;
 import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
+import com.hebaibai.ctrt.transmit.util.sign.BaseSign;
 import io.vertx.core.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
@@ -22,6 +24,11 @@ import java.util.Set;
 @Slf4j
 public class Main {
 
+    static {
+        //加载默认的签名方式
+        CrtrUtils.SIGN_LIST.add(new BaseSign());
+    }
+
     /**
      * 启动入口
      *
@@ -34,6 +41,8 @@ public class Main {
             JSONObject jsonObject = JSONObject.parseObject(getConf(args));
             //获取系统配置
             JSONObject configJson = jsonObject.getJSONObject("config");
+            //插件加载
+            extLoad(configJson);
             //获取系统端口配置
             Integer port = configJson.getInteger("port");
             config.setPort(port);
@@ -103,6 +112,20 @@ public class Main {
         return dataType;
     }
 
+    private static void extLoad(JSONObject configJson) {
+        if (!configJson.containsKey("ext")) {
+            return;
+        }
+        JSONArray ext = configJson.getJSONArray("ext");
+        for (int i = 0; i < ext.size(); i++) {
+            String extClassName = ext.getString(i);
+            try {
+                Class.forName(extClassName);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     /**
      * 从配置中获取 TransmitConfig
