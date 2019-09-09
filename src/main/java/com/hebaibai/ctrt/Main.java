@@ -49,31 +49,11 @@ public class Main {
             while (iterator.hasNext()) {
                 String code = iterator.next();
                 JSONObject transmitJson = jsonObject.getJSONObject(code);
-                TransmitConfig transmitConfig = new TransmitConfig();
-                transmitConfig.setCode(code);
-                //request 配置
-                JSONObject request = transmitJson.getJSONObject("request");
-                transmitConfig.setReqPath(request.getString("path"));
-                transmitConfig.setReqMethod(getHttpMethod(request));
-                transmitConfig.setReqType(getRequestType(request));
-                transmitConfig.setResType(getRequestType(request));
-                //api配置
-                JSONObject api = transmitJson.getJSONObject("api");
-                transmitConfig.setApiPath(api.getString("url"));
-                transmitConfig.setSignCode(api.getString("signCode"));
-                //接口调用超时时间， 默认3秒
-                Integer timeout = (Integer) api.getOrDefault("timeout", 3000);
-                transmitConfig.setTimeout(timeout);
-                transmitConfig.setApiMethod(getHttpMethod(api));
-                transmitConfig.setApiReqType(getRequestType(api));
-                transmitConfig.setApiResType(getResponseType(api));
-                transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(api.getString("request-ftl")));
-                transmitConfig.setApiResFtlText(CrtrUtils.getFileText(api.getString("response-ftl")));
+                TransmitConfig transmitConfig = getTransmitConfig(code, transmitJson);
                 log.info("init transmitConfig: {}", transmitConfig);
                 //加入配置
                 config.put(transmitConfig);
             }
-            log.info("init done ...");
             CtrtLancher ctrtLancher = new CtrtLancher();
             ctrtLancher.start(config);
         } catch (Exception e) {
@@ -123,5 +103,37 @@ public class Main {
         return dataType;
     }
 
+
+    /**
+     * 从配置中获取 TransmitConfig
+     *
+     * @param code
+     * @param transmitJson
+     * @return
+     * @throws IOException
+     */
+    private static TransmitConfig getTransmitConfig(String code, JSONObject transmitJson) throws IOException {
+        TransmitConfig transmitConfig = new TransmitConfig();
+        transmitConfig.setCode(code);
+        //request 配置
+        JSONObject request = transmitJson.getJSONObject("request");
+        transmitConfig.setReqPath(request.getString("path"));
+        transmitConfig.setReqMethod(getHttpMethod(request));
+        transmitConfig.setReqType(getRequestType(request));
+        transmitConfig.setResType(getRequestType(request));
+        //api配置
+        JSONObject api = transmitJson.getJSONObject("api");
+        transmitConfig.setApiPath(api.getString("url"));
+        transmitConfig.setSignCode(api.getString("signCode"));
+        //接口调用超时时间， 默认3秒
+        Integer timeout = (Integer) api.getOrDefault("timeout", 3000);
+        transmitConfig.setTimeout(timeout);
+        transmitConfig.setApiMethod(getHttpMethod(api));
+        transmitConfig.setApiReqType(getRequestType(api));
+        transmitConfig.setApiResType(getResponseType(api));
+        transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(api.getString("request-ftl")));
+        transmitConfig.setApiResFtlText(CrtrUtils.getFileText(api.getString("response-ftl")));
+        return transmitConfig;
+    }
 
 }
