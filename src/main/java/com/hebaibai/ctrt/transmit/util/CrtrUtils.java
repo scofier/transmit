@@ -1,23 +1,33 @@
 package com.hebaibai.ctrt.transmit.util;
 
+import com.hebaibai.ctrt.convert.freemarker.Has;
+import com.hebaibai.ctrt.convert.freemarker.Regular;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.util.convert.BaseConvert;
 import com.hebaibai.ctrt.transmit.util.param.*;
 import com.hebaibai.ctrt.transmit.util.request.*;
 import com.hebaibai.ctrt.transmit.util.sign.BaseSign;
+import freemarker.template.TemplateDirectiveModel;
 import io.vertx.core.http.HttpMethod;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class CrtrUtils {
 
     public static final String CHARSET_NAME = "utf-8";
+
+    /**
+     * freemarker 自定义指令
+     */
+    public static Map<String, TemplateDirectiveModel> FREEMARKER_DIRECTIVE_MODEL = new HashMap() {{
+        put("regular", new Regular());
+        put("has", new Has());
+    }};
+
 
     /**
      * 参数获取工具

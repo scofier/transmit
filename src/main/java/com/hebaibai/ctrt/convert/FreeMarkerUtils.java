@@ -1,14 +1,16 @@
 package com.hebaibai.ctrt.convert;
 
-import com.hebaibai.ctrt.convert.freemarker.Regular;
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
+import freemarker.template.TemplateDirectiveModel;
 
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Freemarker 工具
@@ -30,8 +32,9 @@ public class FreeMarkerUtils {
         //处理空值为空字符串
         configuration.setClassicCompatible(true);
         //加载自定义指令
-        //使用正则提取数据
-        configuration.setSharedVariable("regular", new Regular());
+        for (Map.Entry<String, TemplateDirectiveModel> entry : CrtrUtils.FREEMARKER_DIRECTIVE_MODEL.entrySet()) {
+            configuration.setSharedVariable(entry.getKey(), entry.getValue());
+        }
         //模板加载器
         loader = new StringTemplateLoader();
     }

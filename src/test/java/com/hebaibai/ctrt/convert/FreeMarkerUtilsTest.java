@@ -13,7 +13,8 @@ public class FreeMarkerUtilsTest {
             put("name", "<xml>你好啊<xml>哈哈<xml>");
         }}, new FreeMarkerFtl() {{
             setTemplateName("test");
-            setTemplateText("<@regular pattern='<xml>(.*)<xml>(.*)<xml>'  >${name}</@regular>");
+            setTemplateText("<@regular pattern='<xml>(.*)<xml>(.*)<xml>'  >${name}</@regular>" +
+                    "<@has name='name'></@has>");
         }}));
     }
 }
