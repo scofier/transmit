@@ -140,7 +140,7 @@ public class TransmitVerticle extends AbstractVerticle {
             value = sign.sign(value);
             log.info("request {} after:\n {}", routerVo.getUuid(), value);
         } catch (Exception e) {
-            log.error("request {} error:\n {}", routerVo.getUuid(), e);
+            log.error("request " + routerVo.getUuid() + " error:\n {}", e);
             routingContext.response().end(error(e), CHARSET_NAME);
             return;
         }
@@ -191,8 +191,9 @@ public class TransmitVerticle extends AbstractVerticle {
             //返回响应结果
             routingContext.response().end(value, CHARSET_NAME);
         } catch (Exception e) {
-            log.error("request {} error:\n {}", routerVo.getUuid(), e);
+            log.error("response " + routerVo.getUuid() + " error:\n {}", e);
             routingContext.response().end(error(e), CHARSET_NAME);
+            return;
         }
     }
 

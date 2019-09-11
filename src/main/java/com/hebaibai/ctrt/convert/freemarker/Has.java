@@ -31,57 +31,42 @@ public class Has implements TemplateDirectiveModel {
         if (loopVars.length != 0) {
             return;
         }
+        String name = getName(params);
         if (environment == null || body == null) {
-            throw new RuntimeException("@has 指令必须包含数据");
+            throw new RuntimeException("@has 指令必须包含数据 " + name);
         }
-        Writer out = environment.getOut();
-        if (out == null) {
-            throw new RuntimeException("@has 指令必须包含数据");
-        }
-        body.render(new Writer(out) {
+        body.render(new Writer() {
             @Override
             public void write(char[] cbuf, int off, int len) throws IOException {
-                String name = null;
-                if (params != null) {
-                    Object o = params.get(NAME_KEY);
-                    if (o != null) {
-                        name = o.toString();
-                    }
-                }
-
-                String value = new String(cbuf);
+                String value = new String(cbuf).trim();
                 if (StringUtils.isBlank(value)) {
                     throw new RuntimeException("指令: @has 必须包含数据 " + name);
                 }
-                out.write(value);
             }
 
             @Override
             public void flush() throws IOException {
-                out.flush();
             }
 
             @Override
             public void close() throws IOException {
-                out.close();
             }
         });
 
     }
 
     /**
-     * 根据正则查找
+     * 获取name
      *
-     * @param string
-     * @param pattern
-     * @param group
+     * @param params
      * @return
      */
-    private static String getByPattern(String string, String pattern, int group) {
-        Pattern compile = Pattern.compile(pattern);
-        Matcher matcher = compile.matcher(string);
-        while (matcher.find()) {
-            return matcher.group(group);
+    private static String getName(Map params) {
+        if (params != null) {
+            Object o = params.get(NAME_KEY);
+            if (o != null) {
+                return o.toString();
+            }
         }
         return "";
     }
