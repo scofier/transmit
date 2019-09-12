@@ -4,9 +4,10 @@ import com.hebaibai.ctrt.convert.freemarker.Has;
 import com.hebaibai.ctrt.convert.freemarker.Regular;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.util.convert.BaseConvert;
+import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import com.hebaibai.ctrt.transmit.util.param.*;
 import com.hebaibai.ctrt.transmit.util.request.*;
-import com.hebaibai.ctrt.transmit.util.sign.BaseSign;
+import com.hebaibai.ctrt.transmit.util.ext.BaseExt;
 import freemarker.template.TemplateDirectiveModel;
 import io.vertx.core.http.HttpMethod;
 
@@ -58,9 +59,11 @@ public class CrtrUtils {
     );
 
     /**
-     * 签名工具. 可扩展
+     * 插件. 可扩展
      */
-    public static List<Sign> SIGN_LIST = new ArrayList();
+    public static List<Ext> EXT_LIST = new ArrayList();
+    private static final Ext BASE_EXT = new BaseExt();
+
 
     public static Param param(HttpMethod method, DataType dataType) {
         for (Param param : PARAM_LIST) {
@@ -89,15 +92,14 @@ public class CrtrUtils {
         return null;
     }
 
-    private static final Sign BASE_SIGN = new BaseSign();
 
-    public static Sign sign(String signCode) {
-        for (Sign sign : SIGN_LIST) {
-            if (sign.support(signCode)) {
-                return sign;
+    public static Ext ext(String signCode) {
+        for (Ext ext : EXT_LIST) {
+            if (ext.support(signCode)) {
+                return ext;
             }
         }
-        return BASE_SIGN;
+        return BASE_EXT;
     }
 
     public static String getFileText(String path) throws IOException {

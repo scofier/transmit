@@ -31,12 +31,10 @@ public class DataBaseVerticle extends AbstractVerticle {
         EventBus eventBus = vertx.eventBus();
         eventBus.consumer(EXECUTE_SQL_INSERT, this::insert);
         eventBus.consumer(EXECUTE_SQL_UPDATE, this::update);
-        log.info("start DataBaseVerticle success");
     }
 
     @Override
     public void stop() throws Exception {
-        log.info("stop DataBaseVerticle success");
     }
 
     /**

@@ -7,8 +7,8 @@ import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
-import com.hebaibai.ctrt.transmit.util.sign.BaseSign;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
@@ -36,29 +36,35 @@ public class Main {
             JSONObject jsonObject = JSONObject.parseObject(getConf(args));
             //获取系统配置
             JSONObject configJson = jsonObject.getJSONObject("config");
+
             //插件加载
             extLoad(configJson);
+
             //获取系统端口配置
             Integer port = configJson.getInteger("port");
             config.setPort(port);
+
             //移出配置文件中的config节点
             jsonObject.remove("config");
-            log.info("init port: {}", port);
+
+            //转发配置
+            addTransmitConfig(jsonObject, config);
+
+            //import加载
+            importLoad(configJson, config);
+
             //配置日志数据库
             DataConfig db = configJson.getObject("db", DataConfig.class);
             config.setDataConfig(db);
-            //转发配置
-            Set<String> keys = jsonObject.keySet();
-            Iterator<String> iterator = keys.iterator();
-            while (iterator.hasNext()) {
-                String code = iterator.next();
-                JSONObject transmitJson = jsonObject.getJSONObject(code);
-                TransmitConfig transmitConfig = getTransmitConfig(code, transmitJson);
-                //加入配置
-                config.put(transmitConfig);
-            }
+
+            //启动
             CtrtLancher ctrtLancher = new CtrtLancher();
             ctrtLancher.start(config);
+
+            log.info("init port: {}", port);
+            for (TransmitConfig router : config.getRouters()) {
+                log.info("init config: {}", router.getCode());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -120,6 +126,32 @@ public class Main {
                 e.printStackTrace();
                 System.exit(0);
             }
+        }
+    }
+
+    private static void importLoad(JSONObject configJson, Config config) throws IOException {
+        if (!configJson.containsKey("import")) {
+            return;
+        }
+        JSONArray importJsons = configJson.getJSONArray("ext");
+        for (int i = 0; i < importJsons.size(); i++) {
+            String importFilePath = importJsons.getString(i);
+            log.info("load import file {}", importFilePath);
+            String json = CrtrUtils.getFileText(importFilePath);
+            JSONObject jsonObject = JSONObject.parseObject(json);
+            addTransmitConfig(jsonObject, config);
+        }
+    }
+
+    private static void addTransmitConfig(JSONObject configJson, Config config) throws IOException {
+        Set<String> keys = configJson.keySet();
+        Iterator<String> iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            String code = iterator.next();
+            JSONObject transmitJson = configJson.getJSONObject(code);
+            TransmitConfig transmitConfig = getTransmitConfig(code, transmitJson);
+            //加入配置
+            config.put(transmitConfig);
         }
     }
 
