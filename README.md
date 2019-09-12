@@ -49,29 +49,49 @@ clean package -D skipTests dependency:copy-dependencies -DoutputDirectory=./targ
 ```bash
 #!/bin/bash
 
+JAVA_OPTS=""
+JAVA_MEM_OPTS=""
+
+# 进入当前文件目录
+cd `dirname $0`
 # 项目路径
 DEPLOY_DIR=`pwd`
 CONF_DIR=$DEPLOY_DIR/conf
-echo $CONF_DIR
+STDOUT_FILE=$DEPLOY_DIR/sout.log
 
 # lib
 LIB_DIR=$DEPLOY_DIR/lib
 LIB_JARS=`ls $LIB_DIR|grep .jar|awk '{print "'$LIB_DIR'/"$0}'|tr "\n" ":"`
 
-# 依赖的 lib
-JAVA_OPTS=" -Djava.awt.headless=true -Djava.net.preferIPv4Stack=true "
-JAVA_MEM_OPTS=""
-BITS=`java -version 2>&1 | grep -i 64-bit`
-if [ -n "$BITS" ]; then
-    JAVA_MEM_OPTS=" -server -Xmx512m -Xmx512m -Xmn128m -XX:PermSize=128m -Xss256k -XX:+DisableExplicitGC -XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSCompactAtFullCollection -XX:LargePageSizeInBytes=128m -XX:+UseFastAccessorMethods -XX:+UseCMSInitiatingOccupancyOnly -XX:CMSInitiatingOccupancyFraction=70 "
+# 判断是否已经启动
+PID=`ps -ef | grep "$DEPLOY_DIR" | grep -v 'grep' | awk '{print $2}'`
+
+if [ -n "$PID" ]; then
+    echo "已经启动"
 else
-    JAVA_MEM_OPTS=" -server -Xms1g -Xmx1g -XX:PermSize=128m -XX:SurvivorRatio=2 -XX:+UseParallelGC "
+    # 启动命令
+    java $JAVA_OPTS $JAVA_MEM_OPTS -classpath $CONF_DIR:$LIB_JARS com.hebaibai.ctrt.Main -c config.json > $STDOUT_FILE 2>&1 &
+    echo "启动成功"
 fi
 
-# 启动命令
-java $JAVA_OPTS $JAVA_MEM_OPTS -classpath $CONF_DIR:$LIB_JARS com.hebaibai.ctrt.Main -c config.json
 ```
 
+#### 停止脚本
+```bash
+#!/bin/bash
+
+# 进入当前文件目录
+cd `dirname $0`
+# 项目路径
+DEPLOY_DIR=`pwd`
+
+PID=`ps -ef | grep "$DEPLOY_DIR" | grep -v 'grep' | awk '{print $2}'`
+
+if [ -n "$PID" ]; then
+    echo PID: $PID
+    kill -9 $PID
+fi
+```
 
 
 ## 配置说明
