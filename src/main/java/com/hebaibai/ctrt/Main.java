@@ -7,8 +7,8 @@ import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
+import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
@@ -119,7 +119,6 @@ public class Main {
         JSONArray ext = configJson.getJSONArray("ext");
         for (int i = 0; i < ext.size(); i++) {
             String extClassName = ext.getString(i);
-            log.info("load ext class {}", extClassName);
             try {
                 Class.forName(extClassName);
             } catch (ClassNotFoundException e) {
@@ -127,13 +126,16 @@ public class Main {
                 System.exit(0);
             }
         }
+        for (Ext extObj : CrtrUtils.EXT_LIST) {
+            log.info("load ext code {}", extObj.getCode());
+        }
     }
 
     private static void importLoad(JSONObject configJson, Config config) throws IOException {
         if (!configJson.containsKey("import")) {
             return;
         }
-        JSONArray importJsons = configJson.getJSONArray("ext");
+        JSONArray importJsons = configJson.getJSONArray("import");
         for (int i = 0; i < importJsons.size(); i++) {
             String importFilePath = importJsons.getString(i);
             log.info("load import file {}", importFilePath);
@@ -175,7 +177,7 @@ public class Main {
         //api配置
         JSONObject api = transmitJson.getJSONObject("api");
         transmitConfig.setApiPath(api.getString("url"));
-        transmitConfig.setSignCode(api.getString("signCode"));
+        transmitConfig.setExtCode(api.getString("extCode"));
         //接口调用超时时间， 默认3秒
         Integer timeout = (Integer) api.getOrDefault("timeout", 3000);
         transmitConfig.setTimeout(timeout);

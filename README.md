@@ -1,17 +1,15 @@
-# 报文格式转换工具：transmit
+# 第三方接口对接/数据转换工具：transmit
 
 ## 功能描述：
 
-因为每家保险公司的接口都是不相同的, 开发人员不能每对接一家公司, 就单独开发一套保险产品接口.
-所以写了这个工具.
+当项目中需要使用同一套数据对接多家第三方接口的时候, 比如对接保险公司接口, 对接支付公司接口. 以往的情况是针对每家公司的接口文档开发一套代码, 这样会添加很多不必要的工作量. 针对这种情况, 我开发了这个工具. 这个工具可以做到接口之间参数转换,转发. 节省了对接接口时的开发任务.
 
-可以做到接口之间参数转换,转发. 节省了对接接口时的开发任务.
+## 优点
 
-通过配置和模板的形式, 支持任意类型的参数转换.
-
-模板使用freemarker.
-
-开发框架使用vert.x
+1. 数据转换使用freemarker模板, 无需编写java代码.
+2. 使用vert.x框架编写. 效率高, 代码量小.
+3. 请求数据入库, 数据有迹可循.
+4. 可自己编写插件, 完成其定义签名和自定义freemarker指令.
 
 ## 使用说明
 
@@ -94,7 +92,10 @@ fi
 ```
 
 
-## 配置说明
+### 配置说明
+
+#### 示例配置
+
 ```
 {
 
@@ -104,7 +105,7 @@ fi
     系统端口号
     "port": 9090,
     
-    其他组件加载, 执行CLass.forName
+    其他组件加载, 执行CLass.forName, 可以加载自己定义的一些插件, 完成类似数据入库, 接口签名之类的功能
     "ext": [
       "com.hebaibai.ctrt.Driver"
     ],
@@ -144,8 +145,8 @@ fi
       接口请求地址
       "url": "http://47.98.105.202:9003/api/downloadPolicyUrl",
       
-      接口签名编号(需要手动实现)
-      "signCode": "null",
+      插件编号, 在ext中加载来的
+      "extCode": "null",
       
       接口请求地址
       "method": "GET",
@@ -169,7 +170,93 @@ fi
 }
 ```
 
-    
+#### 日志表sql
 
+```sql
+-- auto-generated definition
+create table api_log
+(
+  id          varchar(64) null,
+  type_code   varchar(64) null
+  comment '类型',
+  send_msg    text        null
+  comment '请求内容',
+  receive     text        null
+  comment '接口返回数据',
+  end_time    datetime    null
+  comment '请求耗时',
+  create_time datetime    null
+  comment '请求时间',
+  status      int         null
+  comment '状态1:success, 0:error'
+)
+  comment '接口请求日志';
 
-​           
+```
+
+## 接口转换示例
+
+### 请求参数:
+
+```xml
+<Demo>
+  <Info>
+    <Code>XXX-1</Code>
+    <UUID>d83a011a-958d-4310-a51b-0fb3a4228ef5</UUID>
+	<Time>2017-11-15 16:57:36</Time>
+  </Info>
+  <XXX>
+    <Order>
+      <SerialNo>0</SerialNo>
+      <OrderNo>123123123</OrderNo>
+	  <OrderCode>asdasdasd</OrderCode>
+	  <Result>1</Result>
+    </Order>
+  </XXX>
+</Demo>
+```
+
+### 转发接口需要的数据:
+
+#### 格式 JSON(POST)
+
+```json
+{
+    "header": {
+        "code": "${ROOT.Info.Code}",
+        "date": "${ROOT.Info.Time}"
+    },
+    "body": {
+        "orderCode": "${ROOT.XXX.Order.OrderCode}"
+    }
+}
+```
+
+#### 格式 FROM(POST)
+
+```
+code=${ROOT.Info.Code}
+date=${ROOT.Info.Time}
+orderCode=${ROOT.XXX.Order.OrderCode}
+```
+
+#### 格式 QUERY(GET)    
+
+```
+code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCode}
+```
+
+#### 格式 XML(POST)           
+
+```xml
+<xml>
+    <header>
+        <code>${ROOT.Info.Code}</code>
+        <date>${ROOT.Info.Time}</date>
+    </header>
+    <body>
+        <orderCode>${ROOT.XXX.Order.OrderCode}</orderCode>
+    </body>
+</xml>
+```
+

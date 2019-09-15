@@ -14,6 +14,13 @@ public interface Ext {
     boolean support(String extCode);
 
     /**
+     * 获取插件编号
+     *
+     * @return
+     */
+    String getCode();
+
+    /**
      * 在api请求前前执行
      *
      * @param value    完整的数据

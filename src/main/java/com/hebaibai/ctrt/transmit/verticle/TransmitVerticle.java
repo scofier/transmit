@@ -121,7 +121,7 @@ public class TransmitVerticle extends AbstractVerticle {
             //转换请求参数,使其符合目标接口
             String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "-REQ");
             //插件
-            Ext ext = CrtrUtils.ext(transmitConfig.getSignCode());
+            Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             value = ext.beforRequest(value, map);
             log.info("request {} after:\n {}", routerVo.getUuid(), value);
             //更新body
@@ -163,6 +163,7 @@ public class TransmitVerticle extends AbstractVerticle {
             });
         } catch (Exception e) {
             routingContext.response().end(error(e), CHARSET_NAME);
+            e.printStackTrace();
             return;
         }
     }
@@ -186,7 +187,7 @@ public class TransmitVerticle extends AbstractVerticle {
             }
             //插件
             Map<String, Object> map = param.params(routerVo);
-            Ext ext = CrtrUtils.ext(transmitConfig.getSignCode());
+            Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             ext.afterResponse(routerVo.getBody(), map);
             String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "-RES");
             log.info("response {} after:\n {}", routerVo.getUuid(), value);

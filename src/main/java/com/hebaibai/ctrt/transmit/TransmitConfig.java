@@ -12,9 +12,9 @@ public class TransmitConfig {
     private String code;
 
     /**
-     * 签名编号
+     * 插件编号
      */
-    private String signCode;
+    private String extCode;
 
     /**
      * 请求路径
