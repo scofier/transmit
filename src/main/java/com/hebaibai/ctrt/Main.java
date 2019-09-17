@@ -12,6 +12,7 @@ import io.vertx.core.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Set;
@@ -170,7 +171,9 @@ public class Main {
         transmitConfig.setCode(code);
         //request 配置
         JSONObject request = transmitJson.getJSONObject("request");
-        transmitConfig.setReqPath(request.getString("path"));
+        //配置中路径去重
+        String path = request.getString("path");
+        transmitConfig.setReqPath(new File(path).getPath());
         transmitConfig.setReqMethod(getHttpMethod(request));
         transmitConfig.setReqType(getRequestType(request));
         transmitConfig.setResType(getRequestType(request));

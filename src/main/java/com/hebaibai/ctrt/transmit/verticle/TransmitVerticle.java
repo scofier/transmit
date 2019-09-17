@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.util.Map;
 
 import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
@@ -77,11 +78,12 @@ public class TransmitVerticle extends AbstractVerticle {
     private void requestBody(RoutingContext routingContext) {
         HttpServerRequest request = routingContext.request();
         HttpMethod method = request.method();
-        String path = request.path();
+        //去除重复的'/'符号
+        String path = new File(request.path()).getPath();
         TransmitConfig transmitConfig = config.get(method, path);
         //没有找到配置
         if (transmitConfig == null) {
-            routingContext.response().end(error(new RuntimeException("not find config")), CHARSET_NAME);
+            routingContext.response().end(error("not find config"), CHARSET_NAME);
             return;
         }
         request.bodyHandler(event -> {
@@ -112,8 +114,12 @@ public class TransmitVerticle extends AbstractVerticle {
             //接受请求的参数
             Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
             Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
-            if (param == null || convert == null) {
-                routingContext.response().end(error(new RuntimeException("config error")), CHARSET_NAME);
+            if (convert == null) {
+                routingContext.response().end(error("not find convert util"), CHARSET_NAME);
+                return;
+            }
+            if (param == null) {
+                routingContext.response().end(error("not find param util"), CHARSET_NAME);
                 return;
             }
             Map<String, Object> map = param.params(routerVo);
@@ -147,6 +153,10 @@ public class TransmitVerticle extends AbstractVerticle {
             String value = routerVo.getBody();
             //转发数据
             Request request = CrtrUtils.request(transmitConfig.getApiMethod(), transmitConfig.getApiReqType());
+            if (request == null) {
+                routingContext.response().end(error("not find request util"), CHARSET_NAME);
+                return;
+            }
             request.request(webClient, value, transmitConfig.getApiPath(), transmitConfig.getTimeout(), event -> {
                 if (!event.succeeded()) {
                     routingContext.response().end(error(event.cause()), CHARSET_NAME);
@@ -181,8 +191,12 @@ public class TransmitVerticle extends AbstractVerticle {
             //取响应参数 和 转换 按照Post形式(从 body 中解析)
             Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
             Convert convert = CrtrUtils.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
-            if (param == null || convert == null) {
-                routingContext.response().end(error(new RuntimeException("config error")), CHARSET_NAME);
+            if (convert == null) {
+                routingContext.response().end(error("not find convert util"), CHARSET_NAME);
+                return;
+            }
+            if (param == null) {
+                routingContext.response().end(error("not find param util"), CHARSET_NAME);
                 return;
             }
             //插件
@@ -201,11 +215,15 @@ public class TransmitVerticle extends AbstractVerticle {
     }
 
     /**
-     * 获取异常中的信息
+     * 返回异常信息
      *
-     * @param throwable
+     * @param msg
      * @return
      */
+    private String error(String msg) {
+        return error(new RuntimeException(msg));
+    }
+
     private String error(Throwable throwable) {
         StringBuilder builder = new StringBuilder();
         builder.append("{ \"error_code\": \"0\", \"error_msg\": \"");
