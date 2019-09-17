@@ -8,8 +8,10 @@ import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
+import com.hebaibai.ctrt.transmit.verticle.TransmitVerticle;
 import io.vertx.core.http.HttpMethod;
-import lombok.extern.slf4j.Slf4j;
+import io.vertx.core.logging.JULLogDelegateFactory;
+import io.vertx.core.spi.logging.LogDelegate;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -22,8 +24,9 @@ import java.util.Set;
  *
  * @author hjx
  */
-@Slf4j
 public class Main {
+
+    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(TransmitVerticle.class.getName());
 
     /**
      * 启动入口
@@ -64,7 +67,7 @@ public class Main {
 
             log.info("init port: {}", port);
             for (TransmitConfig router : config.getRouters()) {
-                log.info("init config: {}", router.getCode());
+                log.info("mapping: {} {};", router.getReqMethod().name(), router.getReqPath());
             }
         } catch (Exception e) {
             e.printStackTrace();

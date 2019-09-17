@@ -3,7 +3,10 @@ package com.hebaibai.ctrt.transmit.verticle;
 import com.hebaibai.ctrt.transmit.Config;
 import com.hebaibai.ctrt.transmit.RouterVo;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
-import com.hebaibai.ctrt.transmit.util.*;
+import com.hebaibai.ctrt.transmit.util.Convert;
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
+import com.hebaibai.ctrt.transmit.util.Param;
+import com.hebaibai.ctrt.transmit.util.Request;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
@@ -12,12 +15,13 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.logging.JULLogDelegateFactory;
+import io.vertx.core.spi.logging.LogDelegate;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.Map;
@@ -29,7 +33,6 @@ import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
  *
  * @author hjx
  */
-@Slf4j
 public class TransmitVerticle extends AbstractVerticle {
 
 
@@ -42,6 +45,8 @@ public class TransmitVerticle extends AbstractVerticle {
     private WebClient webClient;
 
     private EventBus eventBus;
+
+    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(TransmitVerticle.class.getName());
 
     @Override
     public void init(Vertx vertx, Context context) {
@@ -123,13 +128,13 @@ public class TransmitVerticle extends AbstractVerticle {
                 return;
             }
             Map<String, Object> map = param.params(routerVo);
-            log.info("request {} befor:\n {}", routerVo.getUuid(), map);
+            log.debug("request {} befor:\n {}", routerVo.getUuid(), map);
             //转换请求参数,使其符合目标接口
             String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "-REQ");
             //插件
             Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             value = ext.beforRequest(value, map);
-            log.info("request {} after:\n {}", routerVo.getUuid(), value);
+            log.debug("request {} after:\n {}", routerVo.getUuid(), value);
             //更新body
             routerVo.setBody(value);
             routingContext.put(RouterVo.class.getName(), routerVo);
@@ -186,7 +191,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndReturn(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        log.info("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
+        log.debug("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
         try {
             //取响应参数 和 转换 按照Post形式(从 body 中解析)
             Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
@@ -204,7 +209,7 @@ public class TransmitVerticle extends AbstractVerticle {
             Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             ext.afterResponse(routerVo.getBody(), map);
             String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "-RES");
-            log.info("response {} after:\n {}", routerVo.getUuid(), value);
+            log.debug("response {} after:\n {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value, CHARSET_NAME);
         } catch (Exception e) {
