@@ -15,80 +15,40 @@
 
 #### 打包命令
 ```bash
-clean package -D skipTests dependency:copy-dependencies -DoutputDirectory=./target/lib -f pom.xml
+git clone https://github.com/hjx601496320/transmit.git
+cd transmit/
+mvn package
+cd target/
+//解压
+tar -zxvf transmit.tar.gz
+//启动
+sh bin/start.sh
 ```
 
 #### 文件目录
 ```
-.
-├── config 参数转换模板文件
-│   └── XXXX
-│       ├── JAH-transit-result.json
-│       └── JAH-transit-send.xml
-│
-├── config.json 项目启动要加载的配置
-│
-├── lib  项目打包后的文件
+├── bin                         启动脚本
+│   ├── restart.sh
+│   ├── start.sh
+│   └── stop.sh
+├── config                      配置
+│   ├── config.json
+│   └── logback.xml
+├── lib
+│   ├── commons-cli-1.4.jar     依赖
+......
+│   ├── transmit-1.0-SNAPSHOT.jar
+│   ├── vertx-web-client-3.8.0.jar
 │   └── vertx-web-common-3.8.0.jar
-│   └── ....
-│
-├── log  日志
-│   ├── error  
-│   │   └── error.2019-09-09.log
-│   └── info   
-│       └── info.2019-09-09.log
-│
-└── start.sh  启动脚本
+├── log                         日志
+│   ├── debug
+│   │   └── debug.2019-09-17.log
+│   ├── error
+│   │   └── error.2019-09-17.log
+│   └── info
+│       └── info.2019-09-17.log
+└── sout.log
 
-```
-
-#### 启动脚本
-
-```bash
-#!/bin/bash
-
-JAVA_OPTS=""
-JAVA_MEM_OPTS=""
-
-# 进入当前文件目录
-cd `dirname $0`
-# 项目路径
-DEPLOY_DIR=`pwd`
-CONF_DIR=$DEPLOY_DIR/conf
-STDOUT_FILE=$DEPLOY_DIR/sout.log
-
-# lib
-LIB_DIR=$DEPLOY_DIR/lib
-LIB_JARS=`ls $LIB_DIR|grep .jar|awk '{print "'$LIB_DIR'/"$0}'|tr "\n" ":"`
-
-# 判断是否已经启动
-PID=`ps -ef | grep "$DEPLOY_DIR" | grep -v 'grep' | awk '{print $2}'`
-
-if [ -n "$PID" ]; then
-    echo "已经启动"
-else
-    # 启动命令
-    java $JAVA_OPTS $JAVA_MEM_OPTS -classpath $CONF_DIR:$LIB_JARS com.hebaibai.ctrt.Main -c config.json > $STDOUT_FILE 2>&1 &
-    echo "启动成功"
-fi
-
-```
-
-#### 停止脚本
-```bash
-#!/bin/bash
-
-# 进入当前文件目录
-cd `dirname $0`
-# 项目路径
-DEPLOY_DIR=`pwd`
-
-PID=`ps -ef | grep "$DEPLOY_DIR" | grep -v 'grep' | awk '{print $2}'`
-
-if [ -n "$PID" ]; then
-    echo PID: $PID
-    kill -9 $PID
-fi
 ```
 
 
@@ -96,7 +56,7 @@ fi
 
 #### 示例配置
 
-```
+```json
 {
 
   其他配置
@@ -104,6 +64,10 @@ fi
     
     系统端口号
     "port": 9090,
+    
+    引用其他的配置文件的文件路径
+    "import": [
+    ],
     
     其他组件加载, 执行CLass.forName, 可以加载自己定义的一些插件, 完成类似数据入库, 接口签名之类的功能
     "ext": [
@@ -126,8 +90,8 @@ fi
     接受请求
     "request": {
     
-      接受请求的地址 127.0.0.1:9090/downloadPolicy
-      "path": "/downloadPolicy",
+      接受请求的地址 127.0.0.1:9090/download
+      "path": "/download",
       
       请求的方式
       "method": "GET",
@@ -143,7 +107,7 @@ fi
     "api": {
     
       接口请求地址
-      "url": "http://47.98.105.202:9003/api/downloadPolicyUrl",
+      "url": "http://127.0.0.1:9003/api/download",
       
       插件编号, 在ext中加载来的
       "extCode": "null",
@@ -161,10 +125,10 @@ fi
       "response-type": "TEXT",
       
       请求参数转换模板
-      "request-ftl": "/home/hjx/work/myProject/transmit/file/downloadPolicy-req.ftl",
+      "request-ftl": "/home/hjx/work/myProject/transmit/file/download-req.ftl",
       
       响应参数转换模板
-      "response-ftl": "/home/hjx/work/myProject/transmit/file/downloadPolicy-res.ftl"
+      "response-ftl": "/home/hjx/work/myProject/transmit/file/download-res.ftl"
     }
   }
 }

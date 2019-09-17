@@ -59,11 +59,11 @@
         </filter>
     </appender>
 
-    <root level="debug">
+    <logger level="DEBUG" name="com.hebaibai" additivity="true">
         <appender-ref ref="console"/>
         <appender-ref ref="file_info"/>
         <appender-ref ref="file_error"/>
         <appender-ref ref="file_debug"/>
-    </root>
+    </logger>
 
 </configuration>
