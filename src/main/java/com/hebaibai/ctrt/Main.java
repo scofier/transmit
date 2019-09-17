@@ -8,10 +8,8 @@ import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
-import com.hebaibai.ctrt.transmit.verticle.TransmitVerticle;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.logging.JULLogDelegateFactory;
-import io.vertx.core.spi.logging.LogDelegate;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
 import java.io.File;
@@ -24,9 +22,8 @@ import java.util.Set;
  *
  * @author hjx
  */
+@Slf4j
 public class Main {
-
-    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(TransmitVerticle.class.getName());
 
     /**
      * 启动入口
@@ -40,32 +37,24 @@ public class Main {
             JSONObject jsonObject = JSONObject.parseObject(getConf(args));
             //获取系统配置
             JSONObject configJson = jsonObject.getJSONObject("config");
-
             //插件加载
             extLoad(configJson);
-
             //获取系统端口配置
             Integer port = configJson.getInteger("port");
+            log.info("init port: {}", port);
             config.setPort(port);
-
             //移出配置文件中的config节点
             jsonObject.remove("config");
-
             //转发配置
             addTransmitConfig(jsonObject, config);
-
             //import加载
             importLoad(configJson, config);
-
             //配置日志数据库
             DataConfig db = configJson.getObject("db", DataConfig.class);
             config.setDataConfig(db);
-
             //启动
             CtrtLancher ctrtLancher = new CtrtLancher();
             ctrtLancher.start(config);
-
-            log.info("init port: {}", port);
             for (TransmitConfig router : config.getRouters()) {
                 log.info("mapping: {} {};", router.getReqMethod().name(), router.getReqPath());
             }

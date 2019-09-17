@@ -15,13 +15,12 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.logging.JULLogDelegateFactory;
-import io.vertx.core.spi.logging.LogDelegate;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.Map;
@@ -33,6 +32,7 @@ import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
  *
  * @author hjx
  */
+@Slf4j
 public class TransmitVerticle extends AbstractVerticle {
 
 
@@ -45,8 +45,6 @@ public class TransmitVerticle extends AbstractVerticle {
     private WebClient webClient;
 
     private EventBus eventBus;
-
-    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(TransmitVerticle.class.getName());
 
     @Override
     public void init(Vertx vertx, Context context) {
@@ -140,7 +138,7 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.put(RouterVo.class.getName(), routerVo);
             routingContext.next();
         } catch (Exception e) {
-            log.error("request " + routerVo.getUuid() + " error:\n {}", e);
+            log.error("request " + routerVo.getUuid() + " error", e);
             routingContext.response().end(error(e), CHARSET_NAME);
             return;
         }
@@ -177,8 +175,8 @@ public class TransmitVerticle extends AbstractVerticle {
                 return;
             });
         } catch (Exception e) {
+            log.error("request " + routerVo.getUuid() + " error", e);
             routingContext.response().end(error(e), CHARSET_NAME);
-            e.printStackTrace();
             return;
         }
     }
@@ -213,7 +211,7 @@ public class TransmitVerticle extends AbstractVerticle {
             //返回响应结果
             routingContext.response().end(value, CHARSET_NAME);
         } catch (Exception e) {
-            log.error("response " + routerVo.getUuid() + " error:\n {}", e);
+            log.error("response " + routerVo.getUuid() + " error", e);
             routingContext.response().end(error(e), CHARSET_NAME);
             return;
         }

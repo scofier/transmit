@@ -1,0 +1,16 @@
+{
+  "config": {
+    "port": 9527,
+    "ext": [
+    ],
+    "import": [
+    ],
+    "db": {
+      "host": "127.0.0.1",
+      "database": "logdb",
+      "port": 3306,
+      "username": "root",
+      "password": "root"
+    }
+  }
+}

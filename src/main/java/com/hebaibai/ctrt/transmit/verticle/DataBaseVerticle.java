@@ -6,21 +6,19 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
-import io.vertx.core.logging.JULLogDelegateFactory;
-import io.vertx.core.spi.logging.LogDelegate;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author hjx
  */
+@Slf4j
 public class DataBaseVerticle extends AbstractVerticle {
 
     public static String EXECUTE_SQL_INSERT = "execute-sql-insert";
     public static String EXECUTE_SQL_UPDATE = "execute-sql-update";
 
     private AsyncSQLClient sqlClient;
-
-    private static LogDelegate log = new JULLogDelegateFactory().createDelegate(DataBaseVerticle.class.getName());
 
     public DataBaseVerticle(AsyncSQLClient sqlClient) {
         this.sqlClient = sqlClient;
