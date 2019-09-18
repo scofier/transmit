@@ -21,6 +21,7 @@ import io.vertx.ext.web.client.WebClient;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Map;
@@ -166,6 +167,11 @@ public class TransmitVerticle extends AbstractVerticle {
                 } else {
                     //响应数据
                     String body = event.result().bodyAsString(CHARSET_NAME);
+                    if (StringUtils.isBlank(body)) {
+                        log.error("request " + routerVo.getUuid() + " error no response body");
+                        routingContext.response().end(error("no response body"), CHARSET_NAME);
+                        return;
+                    }
                     //更新body中的值, 设置为接口返回值
                     routerVo.setBody(body);
                     //保存接口返回参数
