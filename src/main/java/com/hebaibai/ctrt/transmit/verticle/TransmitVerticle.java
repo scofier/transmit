@@ -99,6 +99,7 @@ public class TransmitVerticle extends AbstractVerticle {
             routerVo.setBody(requestBody);
             routerVo.setPath(path);
             routerVo.setTypeCode(transmitConfig.getCode());
+            log.debug("request {} befor:\n {}", routerVo.getUuid(), requestBody);
             //保存请求记录
             eventBus.send(DataBaseVerticle.EXECUTE_SQL_INSERT, routerVo.getInsertJsonStr());
             routingContext.put(RouterVo.class.getName(), routerVo);
@@ -127,7 +128,7 @@ public class TransmitVerticle extends AbstractVerticle {
                 return;
             }
             Map<String, Object> map = param.params(routerVo);
-            log.debug("request {} befor:\n {}", routerVo.getUuid(), map);
+            log.debug("request {} map:\n {}", routerVo.getUuid(), map);
             //转换请求参数,使其符合目标接口
             String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "-REQ");
             //插件

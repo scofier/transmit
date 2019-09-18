@@ -3,12 +3,27 @@ package com.hebaibai.ctrt.convert;
 import com.hebaibai.ctrt.convert.reader.XmlDataReader;
 import org.junit.Test;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 public class FreeMarkerUtilsTest {
 
+
     @Test
-    public void name() throws Exception {
+    public void name1() throws Exception {
+        System.out.println(FreeMarkerUtils.format(
+                new HashMap() {{
+                    put("app", new BigDecimal(10000000.235));
+                }},
+                new FreeMarkerFtl() {{
+                    setTemplateName("test");
+                    setTemplateText("${app?string('#.##')}");
+                }}));
+    }
+
+    @Test
+    public void name2() throws Exception {
 
         XmlDataReader dataReader = new XmlDataReader();
         dataReader.read("" +
@@ -17,7 +32,7 @@ public class FreeMarkerUtilsTest {
                 "  <GeneralInfoReturn>\n" +
                 "    <UUID>1b438618-1118-4e88-a20f-63a712077050</UUID>\n" +
                 "    <PlateformCode>ECP00056</PlateformCode>\n" +
-                "    <ErrorCode>00</ErrorCode>\n" +
+                "    <ErrorCode>1000000000</ErrorCode>\n" +
                 "    <ErrorMessage>校验成功</ErrorMessage>\n" +
                 "  </GeneralInfoReturn>\n" +
                 "  <PolicyInfoReturns>\n" +
