@@ -1,6 +1,7 @@
 {
   "config": {
     "port": 9527,
+    "cache": true,
     "ext": [
     ],
     "import": [
@@ -11,6 +12,25 @@
       "port": 3306,
       "username": "root",
       "password": "root"
+    }
+  },
+  "config-demo": {
+    "doc": "配置示例",
+    "request": {
+      "path": "/download",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "TEXT"
+    },
+    "api": {
+      "url": "http://127.0.0.1:9003/api/download",
+      "extCode": "null",
+      "method": "GET",
+      "request-type": "QUERY",
+      "timeout": 1,
+      "response-type": "TEXT",
+      "request-ftl": "/hjx/file/download-req.ftl",
+      "response-ftl": "/hjx/file/download-res.ftl"
     }
   }
 }

@@ -27,7 +27,8 @@ public class Main {
 
     /**
      * 启动入口
-     *
+     * 需要传入 -c 配置文件路径 参数
+     * 例如 -c /home/config.json
      * @param args
      */
     public static void main(String[] args) {
@@ -43,6 +44,13 @@ public class Main {
             Integer port = configJson.getInteger("port");
             log.info("init port: {}", port);
             config.setPort(port);
+            //是否缓存模板
+            config.setCache(true);
+            if (configJson.containsKey("cache")) {
+                boolean cache = configJson.getBoolean("cache");
+                config.setCache(cache);
+            }
+            log.info("init cache: {}", config.isCache());
             //移出配置文件中的config节点
             jsonObject.remove("config");
             //转发配置
@@ -144,7 +152,7 @@ public class Main {
         while (iterator.hasNext()) {
             String code = iterator.next();
             JSONObject transmitJson = configJson.getJSONObject(code);
-            TransmitConfig transmitConfig = getTransmitConfig(code, transmitJson);
+            TransmitConfig transmitConfig = getTransmitConfig(config, code, transmitJson);
             //加入配置
             config.put(transmitConfig);
         }
@@ -153,14 +161,16 @@ public class Main {
     /**
      * 从配置中获取 TransmitConfig
      *
+     * @param config
      * @param code
      * @param transmitJson
      * @return
      * @throws IOException
      */
-    private static TransmitConfig getTransmitConfig(String code, JSONObject transmitJson) throws IOException {
+    private static TransmitConfig getTransmitConfig(Config config, String code, JSONObject transmitJson) throws IOException {
         TransmitConfig transmitConfig = new TransmitConfig();
         transmitConfig.setCode(code);
+        transmitConfig.setCache(config.isCache());
         //request 配置
         JSONObject request = transmitJson.getJSONObject("request");
         //配置中路径去重
@@ -179,8 +189,14 @@ public class Main {
         transmitConfig.setApiMethod(getHttpMethod(api));
         transmitConfig.setApiReqType(getRequestType(api));
         transmitConfig.setApiResType(getResponseType(api));
-        transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(api.getString("request-ftl")));
-        transmitConfig.setApiResFtlText(CrtrUtils.getFileText(api.getString("response-ftl")));
+        //请求转换模板文件
+        String requestFtlPath = api.getString("request-ftl");
+        transmitConfig.setApiReqFtlPath(requestFtlPath);
+        transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(requestFtlPath));
+        //响应转换模板文件
+        String responseFtlPath = api.getString("response-ftl");
+        transmitConfig.setApiResFtlPath(responseFtlPath);
+        transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
         return transmitConfig;
     }
 

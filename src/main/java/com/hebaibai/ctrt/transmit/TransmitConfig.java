@@ -1,7 +1,12 @@
 package com.hebaibai.ctrt.transmit;
 
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import io.vertx.core.http.HttpMethod;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.io.IOException;
 
 @Data
 public class TransmitConfig {
@@ -15,6 +20,13 @@ public class TransmitConfig {
      * 插件编号
      */
     private String extCode;
+
+    /**
+     * 是否缓存模板文件
+     */
+    @Getter
+    @Setter
+    private boolean cache;
 
     /**
      * 请求路径
@@ -62,9 +74,19 @@ public class TransmitConfig {
     private String apiReqFtlText;
 
     /**
+     * 转发请求数据转换模板文件路径
+     */
+    private String apiReqFtlPath;
+
+    /**
      * 转发响应数据转换模板
      */
     private String apiResFtlText;
+
+    /**
+     * 转发响应数据转换模板文件路径
+     */
+    private String apiResFtlPath;
 
     /**
      * 请求超时时间
@@ -76,5 +98,40 @@ public class TransmitConfig {
      * TODO 没有实现
      */
     private int retries;
+
+    /**
+     * 判断是否缓存模板文件
+     *
+     * @return
+     */
+    public String getApiReqFtlText() {
+        if (cache) {
+            return apiReqFtlText;
+        } else {
+            try {
+                return CrtrUtils.getFileText(apiReqFtlPath);
+            } catch (IOException e) {
+                throw new RuntimeException("");
+            }
+        }
+
+    }
+
+    /**
+     * 判断是否缓存模板文件
+     *
+     * @return
+     */
+    public String getApiResFtlText() {
+        if (cache) {
+            return apiResFtlText;
+        } else {
+            try {
+                return CrtrUtils.getFileText(apiResFtlPath);
+            } catch (IOException e) {
+                throw new RuntimeException("");
+            }
+        }
+    }
 
 }

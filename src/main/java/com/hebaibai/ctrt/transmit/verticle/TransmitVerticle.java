@@ -99,7 +99,7 @@ public class TransmitVerticle extends AbstractVerticle {
             routerVo.setBody(requestBody);
             routerVo.setPath(path);
             routerVo.setTypeCode(transmitConfig.getCode());
-            log.debug("request {} befor:\n {}", routerVo.getUuid(), requestBody);
+            log.info("request {} befor:\n {}", routerVo.getUuid(), requestBody);
             //保存请求记录
             eventBus.send(DataBaseVerticle.EXECUTE_SQL_INSERT, routerVo.getInsertJsonStr());
             routingContext.put(RouterVo.class.getName(), routerVo);
@@ -128,13 +128,15 @@ public class TransmitVerticle extends AbstractVerticle {
                 return;
             }
             Map<String, Object> map = param.params(routerVo);
-            log.debug("request {} map:\n {}", routerVo.getUuid(), map);
+            log.info("request {} map:\n {}", routerVo.getUuid(), map);
             //转换请求参数,使其符合目标接口
-            String value = convert.convert(map, transmitConfig.getApiReqFtlText(), transmitConfig.getCode() + "-REQ");
+            String apiReqFtlText = transmitConfig.getApiReqFtlText();
+            log.debug("request {} ftl:\n {}", routerVo.getUuid(), apiReqFtlText);
+            String value = convert.convert(map, apiReqFtlText, transmitConfig.getCode() + "-REQ");
             //插件
             Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             value = ext.beforRequest(value, map);
-            log.debug("request {} after:\n {}", routerVo.getUuid(), value);
+            log.info("request {} after:\n {}", routerVo.getUuid(), value);
             //更新body
             routerVo.setBody(value);
             routingContext.put(RouterVo.class.getName(), routerVo);
@@ -196,7 +198,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndReturn(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        log.debug("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
+        log.info("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
         try {
             //取响应参数 和 转换 按照Post形式(从 body 中解析)
             Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
@@ -213,8 +215,10 @@ public class TransmitVerticle extends AbstractVerticle {
             Map<String, Object> map = param.params(routerVo);
             Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             ext.afterResponse(routerVo.getBody(), map);
-            String value = convert.convert(map, transmitConfig.getApiResFtlText(), transmitConfig.getCode() + "-RES");
-            log.debug("response {} after:\n {}", routerVo.getUuid(), value);
+            String apiResFtlText = transmitConfig.getApiResFtlText();
+            log.debug("response {} ftl:\n {}", routerVo.getUuid(), apiResFtlText);
+            String value = convert.convert(map, apiResFtlText, transmitConfig.getCode() + "-RES");
+            log.info("response {} after:\n {}", routerVo.getUuid(), value);
             //返回响应结果
             routingContext.response().end(value, CHARSET_NAME);
         } catch (Exception e) {

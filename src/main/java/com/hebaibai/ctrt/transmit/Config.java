@@ -10,13 +10,26 @@ import java.util.Set;
 
 public class Config {
 
+    /**
+     * 启动时监听的端口
+     */
     @Getter
     @Setter
     private int port;
 
+    /**
+     * 数据库配置
+     */
     @Getter
     @Setter
     private DataConfig dataConfig;
+
+    /**
+     * 是否缓存模板文件
+     */
+    @Getter
+    @Setter
+    private boolean cache;
 
     /**
      * 请求方式 对应数据转换

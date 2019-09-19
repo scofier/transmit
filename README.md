@@ -62,6 +62,9 @@ sh bin/start.sh
   其他配置
   "config": {
     
+    是否缓存模板文件,默认true. 关闭的话每次请求会重新加载模板,方便调试.
+    "cache": true,
+    
     系统端口号
     "port": 9090,
     
@@ -196,7 +199,7 @@ create table api_log
 }
 ```
 
-#### 格式 FROM(POST)
+#### 格式 FORM(POST)
 
 ```
 code=${ROOT.Info.Code}
