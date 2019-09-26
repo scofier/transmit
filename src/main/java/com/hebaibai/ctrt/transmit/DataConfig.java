@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 数据库配置
+ * @author hjx
  */
 @Data
 public class DataConfig {

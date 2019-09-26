@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * 启动器
+ * 程序入口
  *
  * @author hjx
  */
@@ -29,6 +29,7 @@ public class Main {
      * 启动入口
      * 需要传入 -c 配置文件路径 参数
      * 例如 -c /home/config.json
+     *
      * @param args
      */
     public static void main(String[] args) {

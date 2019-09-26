@@ -10,7 +10,7 @@ import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 
-public class GetRequest implements Request {
+public class GetQueryRequest implements Request {
 
     @Override
     public boolean support(HttpMethod method, DataType dataType) {

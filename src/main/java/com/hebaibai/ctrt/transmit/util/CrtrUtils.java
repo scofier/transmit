@@ -17,6 +17,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+/**
+ * 工具集合
+ *
+ * @author hjx
+ */
 public class CrtrUtils {
 
     public static final String CHARSET_NAME = "utf-8";
@@ -28,6 +33,13 @@ public class CrtrUtils {
         put("regular", new Regular());
         put("has", new Has());
     }};
+
+    /**
+     * 插件. 可扩展
+     */
+    public static List<Ext> EXT_LIST = new ArrayList();
+
+    private static final Ext BASE_EXT = new BaseExt();
 
 
     /**
@@ -44,7 +56,7 @@ public class CrtrUtils {
      * 发起请求获取工具
      */
     private static final List<Request> REQUEST_LIST = Arrays.asList(
-            new GetRequest(),
+            new GetQueryRequest(),
             new PostFormRequest(),
             new PostJsonRequest(),
             new PostTextRequest(),
@@ -58,13 +70,14 @@ public class CrtrUtils {
             new BaseConvert()
     );
 
+
     /**
-     * 插件. 可扩展
+     * 获取参数获取器
+     *
+     * @param method
+     * @param dataType
+     * @return
      */
-    public static List<Ext> EXT_LIST = new ArrayList();
-    private static final Ext BASE_EXT = new BaseExt();
-
-
     public static Param param(HttpMethod method, DataType dataType) {
         for (Param param : PARAM_LIST) {
             if (param.support(method, dataType)) {
@@ -74,6 +87,13 @@ public class CrtrUtils {
         return null;
     }
 
+    /**
+     * 获取请求发起器
+     *
+     * @param method
+     * @param dataType
+     * @return
+     */
     public static Request request(HttpMethod method, DataType dataType) {
         for (Request request : REQUEST_LIST) {
             if (request.support(method, dataType)) {
@@ -83,6 +103,13 @@ public class CrtrUtils {
         return null;
     }
 
+    /**
+     * 获取数据转换器
+     *
+     * @param from
+     * @param to
+     * @return
+     */
     public static Convert convert(DataType from, DataType to) {
         for (Convert convert : CONVERT_LIST) {
             if (convert.support(from, to)) {
@@ -93,6 +120,12 @@ public class CrtrUtils {
     }
 
 
+    /**
+     * 获取插件
+     *
+     * @param signCode
+     * @return
+     */
     public static Ext ext(String signCode) {
         for (Ext ext : EXT_LIST) {
             if (ext.support(signCode)) {
@@ -102,6 +135,13 @@ public class CrtrUtils {
         return BASE_EXT;
     }
 
+    /**
+     * 读取文件
+     *
+     * @param path
+     * @return
+     * @throws IOException
+     */
     public static String getFileText(String path) throws IOException {
         if (!path.startsWith("/")) {
             path = System.getProperty("user.dir") + "/" + path;

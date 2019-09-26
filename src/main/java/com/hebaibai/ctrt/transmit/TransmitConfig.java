@@ -8,6 +8,9 @@ import lombok.Setter;
 
 import java.io.IOException;
 
+/**
+ * @author hjx
+ */
 @Data
 public class TransmitConfig {
 

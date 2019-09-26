@@ -1,17 +1,16 @@
 package com.hebaibai.ctrt.transmit;
 
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.annotation.JSONField;
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import lombok.Data;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * @author hjx
+ */
 @Data
 public class RouterVo {
 
