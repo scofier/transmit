@@ -44,10 +44,13 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) throws Exception {
+
         //获取配置文件内容
         JSONObject jsonObject = getConf(args);
+
         //获取系统配置
         JSONObject configJson = jsonObject.getJSONObject("config");
+
         //获取prop
         if (configJson.containsKey("prop")) {
             String propJson = configJson.getString("prop");
@@ -56,12 +59,15 @@ public class Main {
             Object prop = dataReader.getRequestData().get(DataReader.ROOT_NAME);
             config.setProp(prop);
         }
+
         //插件加载
         extLoad(configJson);
+
         //获取系统端口配置
         Integer port = configJson.getInteger("port");
         log.info("init port: {}", port);
         config.setPort(port);
+
         //是否缓存模板
         config.setCache(true);
         if (configJson.containsKey("cache")) {
@@ -69,15 +75,22 @@ public class Main {
             config.setCache(cache);
         }
         log.info("init cache: {}", config.isCache());
+
         //移出配置文件中的config节点
         jsonObject.remove("config");
+
         //转发配置
         addTransmitConfig(jsonObject);
+
         //import加载
         importLoad(configJson);
+
         //配置日志数据库
-        DataConfig db = configJson.getObject("db", DataConfig.class);
-        config.setDataConfig(db);
+        if (configJson.containsKey("db")) {
+            DataConfig db = configJson.getObject("db", DataConfig.class);
+            config.setDataConfig(db);
+        }
+
         //启动
         CtrtLancher ctrtLancher = new CtrtLancher();
         ctrtLancher.start(config);

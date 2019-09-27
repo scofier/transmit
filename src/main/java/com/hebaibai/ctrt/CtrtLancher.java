@@ -28,20 +28,23 @@ public class CtrtLancher {
     public void start(Config config) {
         TransmitVerticle transmitVerticle = new TransmitVerticle();
         transmitVerticle.setConfig(config);
+
         //部署
         vertx.deployVerticle(transmitVerticle, res -> {
             if (res.succeeded()) {
                 verticleIds.add(res.result());
             }
         });
+
         //数据库部署
         DataConfig dataConfig = config.getDataConfig();
-        AsyncSQLClient sqlClient = MySQLClient.createShared(
-                vertx,
-                dataConfig.getJson(),
-                "plumber_pool:" + dataConfig.getHost()
-        );
-        DataBaseVerticle dataBaseVerticle = new DataBaseVerticle(sqlClient);
+        DataBaseVerticle dataBaseVerticle = new DataBaseVerticle();
+        if (dataConfig != null) {
+            AsyncSQLClient sqlClient = MySQLClient.createShared(
+                    vertx, dataConfig.getJson(), "plumber_pool:" + dataConfig.getHost()
+            );
+            dataBaseVerticle.setSqlClient(sqlClient);
+        }
         dataBaseVerticle.init(vertx, context);
         vertx.deployVerticle(dataBaseVerticle, res -> {
             if (res.succeeded()) {

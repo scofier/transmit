@@ -7,9 +7,12 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.asyncsql.AsyncSQLClient;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * 没有配置sqlClient时，不做任何处理
+ *
  * @author hjx
  */
 @Slf4j
@@ -18,21 +21,31 @@ public class DataBaseVerticle extends AbstractVerticle {
     public static String EXECUTE_SQL_INSERT = "execute-sql-insert";
     public static String EXECUTE_SQL_UPDATE = "execute-sql-update";
 
+    @Setter
     private AsyncSQLClient sqlClient;
-
-    public DataBaseVerticle(AsyncSQLClient sqlClient) {
-        this.sqlClient = sqlClient;
-    }
 
     @Override
     public void start() throws Exception {
         EventBus eventBus = vertx.eventBus();
-        eventBus.consumer(EXECUTE_SQL_INSERT, this::insert);
-        eventBus.consumer(EXECUTE_SQL_UPDATE, this::update);
+        if (sqlClient == null) {
+            eventBus.consumer(EXECUTE_SQL_INSERT, this::log);
+            eventBus.consumer(EXECUTE_SQL_UPDATE, this::log);
+        } else {
+            eventBus.consumer(EXECUTE_SQL_INSERT, this::insert);
+            eventBus.consumer(EXECUTE_SQL_UPDATE, this::update);
+        }
     }
 
     @Override
     public void stop() throws Exception {
+    }
+
+    /**
+     * 没有配置sqlClient时的处理
+     *
+     * @param jsonMsg
+     */
+    private void log(Message<String> jsonMsg) {
     }
 
     /**
