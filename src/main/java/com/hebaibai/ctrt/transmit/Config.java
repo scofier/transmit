@@ -4,9 +4,7 @@ import io.vertx.core.http.HttpMethod;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author hjx
@@ -39,6 +37,13 @@ public class Config {
      */
     @Getter
     private Set<TransmitConfig> routers = new HashSet();
+
+    /**
+     * 配置中的属性
+     */
+    @Setter
+    @Getter
+    private Object prop;
 
     /**
      * 添加对应关系

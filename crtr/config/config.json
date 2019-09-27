@@ -2,6 +2,9 @@
   "config": {
     "port": 9527,
     "cache": true,
+    "prop": {
+      "ip": "127.0.0.1"
+    },
     "ext": [
     ],
     "import": [
@@ -23,8 +26,8 @@
       "response-type": "TEXT"
     },
     "api": {
-      "url": "http://127.0.0.1:9003/api/download",
-      "extCode": "null",
+      "url": "http://${ip}:9003/api/download",
+      "extCode": null,
       "method": "GET",
       "request-type": "QUERY",
       "timeout": 1,
