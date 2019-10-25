@@ -34,11 +34,6 @@ public class CrtrUtils {
         put("has", new Has());
     }};
 
-    /**
-     * 插件. 可扩展
-     */
-    public static List<Ext> EXT_LIST = new ArrayList();
-
     private static final Ext BASE_EXT = new BaseExt();
 
 
@@ -127,7 +122,7 @@ public class CrtrUtils {
      * @return
      */
     public static Ext ext(String signCode) {
-        for (Ext ext : EXT_LIST) {
+        for (Ext ext : Ext.EXT_LIST) {
             if (ext.support(signCode)) {
                 return ext;
             }
