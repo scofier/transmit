@@ -14,6 +14,7 @@
 
     <dependencies>
 
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -82,6 +83,12 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mysql-postgresql-client</artifactId>
             <version>${vertx-version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.hebaibai</groupId>
+            <artifactId>transmit-ext</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
