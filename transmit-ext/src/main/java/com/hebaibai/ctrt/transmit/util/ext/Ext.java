@@ -30,6 +30,16 @@ public interface Ext {
     String getCode();
 
     /**
+     * 获取请求体后
+     * 转换参数格式前
+     *
+     * @param value    请求体中的数据
+     * @param valueMap 原始数据(放进freemarker的数据)
+     * @return
+     */
+    void beforRequestConvert(String value, Map<String, Object> valueMap) throws Exception;
+
+    /**
      * 在api请求前前执行
      *
      * @param value    使用模板转换后的数据
@@ -45,5 +55,5 @@ public interface Ext {
      * @param valueMap 原始数据(放进freemarker的数据)
      * @return
      */
-    String afterResponse(String value, Map<String, Object> valueMap) throws Exception;
+    void afterResponse(String value, Map<String, Object> valueMap) throws Exception;
 }

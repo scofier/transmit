@@ -22,3 +22,5 @@ log/
 file/
 
 fnbx-ext/
+
+config\.json

@@ -41,7 +41,7 @@ public class FreeMarkerUtilsTest {
                 "      <ProposalNo>TEAK201935020000011171</ProposalNo>\n" +
                 "      <PolicyNo>                      </PolicyNo>\n" +
                 "      <SaveResult>00</SaveResult>\n" +
-                "      <SaveMessage>投保单TEAK201935020000011171自动核保通过，需见费转保单!交费通知单号为：3502190915900001,微信交费链接为：weixin://wxpay/bizpayurl?pr=z4Q557N</SaveMessage>\n" +
+                "      <SaveMessage>投保单TEAK201935020000011314自动核保通过，需见费转保单!交费通知单号为：3502191115900013,微信交费链接为：weixin://wxpay/bizpayurl?pr=ujyGTaJ</SaveMessage>\n" +
                 "    </PolicyInfoReturn>\n" +
                 "  </PolicyInfoReturns>\n" +
                 "</ReturnInfo>\n");

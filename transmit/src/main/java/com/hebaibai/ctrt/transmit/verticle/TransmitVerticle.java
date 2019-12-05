@@ -115,6 +115,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convert(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
+        Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
         try {
             //接受请求的参数
             Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
@@ -129,12 +130,16 @@ public class TransmitVerticle extends AbstractVerticle {
             }
             Map<String, Object> map = param.params(routerVo);
             log.info("request {} map:\n {}", routerVo.getUuid(), map);
+
+            //插件,获取请求体后,转换参数格式前
+            ext.beforRequestConvert(routerVo.getBody(), map);
             //转换请求参数,使其符合目标接口
             String apiReqFtlText = transmitConfig.getApiReqFtlText();
             log.debug("request {} ftl:\n {}", routerVo.getUuid(), apiReqFtlText);
             String value = convert.convert(map, apiReqFtlText, transmitConfig.getCode() + "-REQ");
-            //插件
-            Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
+
+
+            //插件, 数据转换后, 请求接口前
             value = ext.beforRequest(value, map);
             log.info("request {} after:\n {}", routerVo.getUuid(), value);
             //更新body
@@ -211,10 +216,13 @@ public class TransmitVerticle extends AbstractVerticle {
                 routingContext.response().end(error("not find param util"), CHARSET_NAME);
                 return;
             }
-            //插件
+
+            //插件, 请求接口后, 转换响应前
             Map<String, Object> map = param.params(routerVo);
             Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
             ext.afterResponse(routerVo.getBody(), map);
+
+
             String apiResFtlText = transmitConfig.getApiResFtlText();
             log.debug("response {} ftl:\n {}", routerVo.getUuid(), apiResFtlText);
             String value = convert.convert(map, apiResFtlText, transmitConfig.getCode() + "-RES");

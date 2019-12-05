@@ -180,7 +180,7 @@ public class Main {
                 System.exit(0);
             }
         }
-        for (Ext extObj : CrtrUtils.EXT_LIST) {
+        for (Ext extObj : Ext.EXT_LIST) {
             log.info("load ext code {}", extObj.getCode());
         }
     }
