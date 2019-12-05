@@ -24,3 +24,5 @@ file/
 fnbx-ext/
 
 config\.json
+
+config/
