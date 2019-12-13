@@ -14,6 +14,22 @@ import java.io.IOException;
 @Data
 public class TransmitConfig {
 
+    public enum ConfigType {
+        /**
+         * 是一个api转发
+         */
+        API,
+        /**
+         * 是返回文字
+         */
+        TEXT
+    }
+
+    /**
+     * 配置类型, 默认为API
+     */
+    private ConfigType configType = ConfigType.API;
+
     /**
      * 配置编号
      */
@@ -108,7 +124,8 @@ public class TransmitConfig {
      * @return
      */
     public String getApiReqFtlText() {
-        if (cache) {
+        //开启缓存, 或者配置类型是TEXT的, 直接返回
+        if (cache || configType == ConfigType.TEXT) {
             return apiReqFtlText;
         } else {
             try {

@@ -241,29 +241,41 @@ public class Main {
         String path = new File(request.getString("path")).getPath();
         transmitConfig.setReqMethod(getHttpMethod(request));
         transmitConfig.setReqType(getRequestType(request));
-        transmitConfig.setResType(getRequestType(request));
+        transmitConfig.setResType(getResponseType(request));
         transmitConfig.setReqPath(getStringConfig(path));
         //api配置
-        JSONObject api = transmitJson.getJSONObject("api");
-        transmitConfig.setApiPath(getStringConfig(api.getString("url")));
-        transmitConfig.setExtCode(api.getString("extCode"));
-        //接口调用超时时间， 默认3秒
-        int timeout = 3000;
-        if (api.containsKey("timeout")) {
-            timeout = api.getIntValue("timeout");
+        if (transmitJson.containsKey("api")) {
+            transmitConfig.setConfigType(TransmitConfig.ConfigType.API);
+            JSONObject api = transmitJson.getJSONObject("api");
+            transmitConfig.setApiPath(getStringConfig(api.getString("url")));
+            transmitConfig.setExtCode(api.getString("extCode"));
+            //接口调用超时时间， 默认3秒
+            int timeout = 3000;
+            if (api.containsKey("timeout")) {
+                timeout = api.getIntValue("timeout");
+            }
+            transmitConfig.setTimeout(timeout);
+            transmitConfig.setApiMethod(getHttpMethod(api));
+            transmitConfig.setApiReqType(getRequestType(api));
+            transmitConfig.setApiResType(getResponseType(api));
+            //请求转换模板文件
+            String requestFtlPath = getStringConfig(api.getString("request-ftl"));
+            transmitConfig.setApiReqFtlPath(requestFtlPath);
+            transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(requestFtlPath));
+            //响应转换模板文件
+            String responseFtlPath = getStringConfig(api.getString("response-ftl"));
+            transmitConfig.setApiResFtlPath(responseFtlPath);
+            transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
         }
-        transmitConfig.setTimeout(timeout);
-        transmitConfig.setApiMethod(getHttpMethod(api));
-        transmitConfig.setApiReqType(getRequestType(api));
-        transmitConfig.setApiResType(getResponseType(api));
-        //请求转换模板文件
-        String requestFtlPath = getStringConfig(api.getString("request-ftl"));
-        transmitConfig.setApiReqFtlPath(requestFtlPath);
-        transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(requestFtlPath));
-        //响应转换模板文件
-        String responseFtlPath = getStringConfig(api.getString("response-ftl"));
-        transmitConfig.setApiResFtlPath(responseFtlPath);
-        transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
+        //text配置
+        else if (transmitJson.containsKey("text")) {
+            transmitConfig.setConfigType(TransmitConfig.ConfigType.TEXT);
+            JSONObject page = transmitJson.getJSONObject("text");
+            String responseFtlPath = getStringConfig(page.getString("response-ftl"));
+            transmitConfig.setApiResFtlPath(responseFtlPath);
+            transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
+        }
+
         return transmitConfig;
     }
 

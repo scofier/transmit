@@ -133,6 +133,25 @@ sh bin/start.sh
       响应参数转换模板
       "response-ftl": "/home/hjx/work/myProject/transmit/file/download-res.ftl"
     }
+
+    新增配置类型, 用于直接返回文字信息
+    "text-page": {
+      "doc": "测试页面",
+      "request": {
+        "path": "/index",
+        "method": "GET",
+        "request-type": "QUERY",
+
+        相应格式为 html
+        "response-type": "HTML"
+    },
+      
+      返回文字信息
+      "text": {      
+        响应信息的模板文件
+        "response-ftl": "result.ftl"
+      }
+    }
   }
 }
 ```

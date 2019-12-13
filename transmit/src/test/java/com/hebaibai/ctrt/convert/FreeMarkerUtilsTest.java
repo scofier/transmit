@@ -14,11 +14,11 @@ public class FreeMarkerUtilsTest {
     public void name1() throws Exception {
         System.out.println(FreeMarkerUtils.format(
                 new HashMap() {{
-                    put("app", new BigDecimal(10000000.235));
+//                    put("app", null);
                 }},
                 new FreeMarkerFtl() {{
                     setTemplateName("test");
-                    setTemplateText("${app?string('#.##')}");
+                    setTemplateText("${app.asd!}");
                 }}));
     }
 
@@ -26,60 +26,68 @@ public class FreeMarkerUtilsTest {
     public void name2() throws Exception {
 
         XmlDataReader dataReader = new XmlDataReader();
-        dataReader.read("" +
-                "<ReturnInfo>\n" +
-                "  <name>120009</name>\n" +
-                "  <GeneralInfoReturn>\n" +
-                "    <UUID>1b438618-1118-4e88-a20f-63a712077050</UUID>\n" +
-                "    <PlateformCode>ECP00056</PlateformCode>\n" +
-                "    <ErrorCode>1000000000</ErrorCode>\n" +
-                "    <ErrorMessage>校验成功</ErrorMessage>\n" +
-                "  </GeneralInfoReturn>\n" +
-                "  <PolicyInfoReturns>\n" +
-                "    <PolicyInfoReturn>\n" +
-                "      <SerialNo>0</SerialNo>\n" +
-                "      <ProposalNo>TEAK201935020000011171</ProposalNo>\n" +
-                "      <PolicyNo>                      </PolicyNo>\n" +
-                "      <SaveResult>00</SaveResult>\n" +
-                "      <SaveMessage>投保单TEAK201935020000011314自动核保通过，需见费转保单!交费通知单号为：3502191115900013,微信交费链接为：weixin://wxpay/bizpayurl?pr=ujyGTaJ</SaveMessage>\n" +
-                "    </PolicyInfoReturn>\n" +
-                "  </PolicyInfoReturns>\n" +
-                "</ReturnInfo>\n");
+        dataReader.read(" \n" +
+                "<soap:Envelope\n" +
+                "    xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "    <soap:Body>\n" +
+                "        <ns2:savepropertyProposalResponse\n" +
+                "            xmlns:ns2=\"http://property.provider.app.thirdparty.echannel.ebiz.isoftstone.com/\">\n" +
+                "            <return>\n" +
+                "                <responseBody>\n" +
+                "                    <responseHead>\n" +
+                "                        <errorMessage>成功</errorMessage>\n" +
+                "                        <requestType>00001</requestType>\n" +
+                "                        <responseCode>0000</responseCode>\n" +
+                "                    </responseHead>\n" +
+                "                    <propertyreturn>\n" +
+//                "                        <orderCode>01010191212102484</orderCode>\n" +
+                "                    </propertyreturn>\n" +
+                "                </responseBody>\n" +
+                "            </return>\n" +
+                "        </ns2:savepropertyProposalResponse>\n" +
+                "    </soap:Body>\n" +
+                "</soap:Envelope>");
 
         Map<String, Object> requestData = dataReader.getRequestData();
 
         System.out.println(FreeMarkerUtils.format(requestData, new FreeMarkerFtl() {{
             setTemplateName("test");
-            setTemplateText("" +
-                    "<#assign map={\n" +
-                    "    \"120010\":\"16\",\n" +
-                    "    \"120003\":\"04\",\n" +
-                    "    \"120005\":\"10\",\n" +
-                    "    \"120006\":\"06\",\n" +
-                    "    \"120009\":\"99\",\n" +
-                    "    \"120001\":\"01\",\n" +
-                    "    \"120002\":\"03\",\n" +
-                    "    \"120007\":\"99\"\n" +
-                    "    }/>" +
-                    "${map[ROOT.name]}" +
-                    "{\n" +
+            setTemplateText("{\n" +
+                    "<#if ROOT.Body.Fault.faultcode?length gt 1 >\n" +
                     "    \"header\": {\n" +
-                    "        \"type\": \"\",\n" +
-                    "        \"uuid\": \"${ROOT.GeneralInfoReturn.UUID}\",\n" +
-                    "        \"errorMessage\": \"${ROOT.GeneralInfoReturn.ErrorCode}\",\n" +
-                    "        <#if ROOT.PolicyInfoReturns.PolicyInfoReturn.ProposalNo != null>\n" +
-                    "        \"code\": \"1\",\n" +
-                    "        <#else>\n" +
-                    "        \"code\": \"0\",\n" +
-                    "        </#if>\n" +
-                    "        \"tradeTime\": \"${.now?string['yyyy-MM-dd HH:mm:ss']}\"\n" +
-                    "\n" +
+                    "    \"type\": \"PAY\",\n" +
+                    "    \"uuid\": null,\n" +
+                    "    \"errorMessage\": \"${ROOT.Body.Fault.faultstring}\",\n" +
+                    "    \"code\": \"0\",\n" +
+                    "    \"tradeTime\": \"${.now?string['yyyy-MM-dd HH:mm:ss']}\"\n" +
+                    "    }\n" +
+                    "<#elseif ROOT.Body.savepropertyProposalResponse.return.responseBody.responseHead.responseCode != \"0000\" >\n" +
+                    "    \"header\": {\n" +
+                    "    \"type\": \"PAY\",\n" +
+                    "    \"uuid\": null,\n" +
+                    "    \"errorMessage\": \"${ROOT.Body.savepropertyProposalResponse.return.responseBody.responseHead.errorMessage}\",\n" +
+                    "    \"code\": \"0\",\n" +
+                    "    \"tradeTime\": \"${.now?string['yyyy-MM-dd HH:mm:ss']}\"\n" +
+                    "    }\n" +
+                    "<#elseif ROOT.Body.savepropertyProposalResponse.return.responseBody.responseHead.responseCode == \"0000\" >\n" +
+                    "    \"header\": {\n" +
+                    "    \"type\": \"PAY\",\n" +
+                    "    \"uuid\": null,\n" +
+                    "    \"errorMessage\": null,\n" +
+                    "    \"code\": \"1\",\n" +
+                    "    \"tradeTime\": \"${.now?string['yyyy-MM-dd HH:mm:ss']}\"\n" +
                     "    },\n" +
                     "    \"body\": {\n" +
-                    "        \"type\": \"PAY\",\n" +
-                    "        \"outOrderNo\": \"${ROOT.PolicyInfoReturns.PolicyInfoReturn.ProposalNo}\",\n" +
-                    "        \"payUrl\": \"<@regular pattern='投保单(.*)自动核保通过，需见费转保单!交费通知单号为：(.*),微信交费链接为：(.*)' group='3'>${ROOT.PolicyInfoReturns.PolicyInfoReturn.SaveMessage}</@regular>\"\n" +
+                    "    \"msg\": \"${ROOT.Body.savepropertyProposalResponse.return.responseBody.responseHead.errorMessage}\",\n" +
+                    "    \"payType\": \"PAY\",\n" +
+                    "    <#if ROOT.Body.savepropertyProposalResponse.return.responseBody.propertyreturn?is_string>\n" +
+                    "        \"outOrderNo\": null,\n" +
+                    "    <#else >\n" +
+                    "        \"outOrderNo\": \"${ROOT.Body.savepropertyProposalResponse.return.responseBody.propertyreturn.orderCode}\",\n" +
+                    "    </#if>\n" +
+                    "    \"payUrl\": null\n" +
                     "    }\n" +
+                    "</#if>\n" +
                     "}");
         }}));
     }
