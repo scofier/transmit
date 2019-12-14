@@ -3,6 +3,7 @@
     <title>index</title>
 </head>
 <body>
-<h1>${ROOT.UUID}</h1>
+<h1>${ROOT.error_code}</h1>
+<h1>${REQUEST.UUID}</h1>
 </body>
 </html>

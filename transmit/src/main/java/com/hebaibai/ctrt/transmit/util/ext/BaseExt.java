@@ -15,13 +15,11 @@ public class BaseExt implements Ext {
      */
     @Override
     public boolean support(String extCode) {
-
         return true;
     }
 
     @Override
     public String getCode() {
-
         return "base_ext";
     }
 
@@ -32,7 +30,6 @@ public class BaseExt implements Ext {
 
     @Override
     public String beforRequest(String value, Map<String, Object> valueMap) {
-
         return value;
     }
 

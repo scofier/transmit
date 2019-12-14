@@ -19,10 +19,5 @@ target/
 
 log/
 
-file/
-
 fnbx-ext/
 
-config\.json
-
-config/

@@ -20,6 +20,11 @@ public class RouterVo {
     private String uuid = UUID.randomUUID().toString();
 
     /**
+     * 原始请求中经过处理的参数
+     */
+    private Map<String, Object> requestMap;
+
+    /**
      * 配置中的类型
      */
     private String typeCode;
@@ -30,12 +35,12 @@ public class RouterVo {
     private String path;
 
     /**
-     * 请求中的请求体
+     * 请求中的请求体(原始请求或者调用接口后的结果)
      */
     private String body;
 
     /**
-     * get请求中的参数
+     * 原始get请求中的参数
      */
     private MultiMap params;
 

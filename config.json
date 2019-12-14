@@ -1,0 +1,36 @@
+{
+  "config": {
+    "port": 8080,
+    "cache": false
+  },
+  "test": {
+    "doc": "测试",
+    "request": {
+      "path": "/api/test",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "HTML"
+    },
+    "api": {
+      "timeout": 10000,
+      "url": "http://127.0.0.1:8080/text",
+      "method": "POST",
+      "request-type": "TEXT",
+      "response-type": "JSON",
+      "request-ftl": "send.ftl",
+      "response-ftl": "result.ftl"
+    }
+  },
+  "text-page": {
+    "doc": "测试页面",
+    "request": {
+      "path": "/index",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "HTML"
+    },
+    "text": {
+      "response-ftl": "result.ftl"
+    }
+  }
+}
