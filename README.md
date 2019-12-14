@@ -54,7 +54,7 @@ sh bin/start.sh
 
 ### 配置说明
 
-#### 示例配置
+#### 配置示例
 
 ```json
 {
@@ -134,18 +134,16 @@ sh bin/start.sh
       "response-ftl": "/home/hjx/work/myProject/transmit/file/download-res.ftl"
     }
 
-    新增配置类型, 用于直接返回文字信息
+    新增配置类型, 用于直接返回文字信息(可以用快速定义一个页面, 接口)
     "text-page": {
       "doc": "测试页面",
       "request": {
         "path": "/index",
         "method": "GET",
         "request-type": "QUERY",
-
         相应格式为 html
         "response-type": "HTML"
-    },
-      
+      },
       返回文字信息
       "text": {      
         响应信息的模板文件
@@ -246,3 +244,49 @@ code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCo
 </xml>
 ```
 
+## 返回页面实例
+
+#### 配置示例
+
+```json
+{
+  "config": {
+    "port": 8080,
+    "cache": false
+  },
+  "text-page": {
+    "doc": "测试页面",
+    "request": {
+      设置请求路径
+      "path": "/index",
+      设置请求参数
+      "method": "GET",
+      请求参数类型
+      "request-type": "QUERY",
+      设置响应格式(这里是html, 也可以是 xml, json)
+      "response-type": "HTML"
+    },
+    "text": {
+      对应的页面文件
+      "response-ftl": "result.ftl"
+    }
+  }
+}
+```
+
+##### 页面文件: result.ftl
+
+```html
+<html>
+<head>
+    <title>index</title>
+</head>
+<body>
+    <h1>${ROOT.uuid}</h1>
+</body>
+</html>
+```
+
+#### 对应请求地址
+
+`http://127.0.0.1:8080/index?uuid=12`
