@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
@@ -97,7 +98,7 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.response().end(error("not find param util"), CHARSET_NAME);
             return;
         }
-        Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
+        Ext ext = transmitConfig.getExt();
         request.bodyHandler(event -> {
             String requestBody = event.toString(CHARSET_NAME);
             RouterVo routerVo = new RouterVo();
@@ -136,7 +137,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void processData(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
+        Ext ext = transmitConfig.getExt();
         //原始请求中的参数
         Map<String, Object> requestMap = routerVo.getRequestMap();
         Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
@@ -188,27 +189,37 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.response().end(error("not find request util"), CHARSET_NAME);
             return;
         }
+        Ext ext = transmitConfig.getExt();
         try {
-            request.request(webClient, value, transmitConfig.getApiPath(), transmitConfig.getTimeout(), event -> {
-                if (!event.succeeded()) {
-                    routingContext.response().end(error(event.cause()), CHARSET_NAME);
-                }
-                //响应数据
-                else {
-                    String body = event.result().bodyAsString(CHARSET_NAME);
-                    if (StringUtils.isBlank(body)) {
-                        log.error("request " + routerVo.getUuid() + " error no response body");
-                        routingContext.response().end(error("no response body"), CHARSET_NAME);
+            //请求接口前, 获取请求头
+            Map<String, String> requestHeaders = ext.requestHeaders(value);
+            if (requestHeaders == null) {
+                requestHeaders = new HashMap<>();
+            }
+            request.request(
+                    webClient, requestHeaders, value,
+                    transmitConfig.getApiPath(),
+                    transmitConfig.getTimeout(),
+                    event -> {
+                        if (!event.succeeded()) {
+                            routingContext.response().end(error(event.cause()), CHARSET_NAME);
+                        }
+                        //响应数据
+                        else {
+                            String body = event.result().bodyAsString(CHARSET_NAME);
+                            if (StringUtils.isBlank(body)) {
+                                log.error("request " + routerVo.getUuid() + " error no response body");
+                                routingContext.response().end(error("no response body"), CHARSET_NAME);
+                                return;
+                            }
+                            //更新body中的值, 设置为接口返回值
+                            routerVo.setBody(body);
+                            //保存接口返回参数
+                            eventBus.send(DataBaseVerticle.EXECUTE_SQL_UPDATE, routerVo.getUpdateJsonStr());
+                            routingContext.next();
+                        }
                         return;
-                    }
-                    //更新body中的值, 设置为接口返回值
-                    routerVo.setBody(body);
-                    //保存接口返回参数
-                    eventBus.send(DataBaseVerticle.EXECUTE_SQL_UPDATE, routerVo.getUpdateJsonStr());
-                    routingContext.next();
-                }
-                return;
-            });
+                    });
         } catch (Exception e) {
             log.error("request " + routerVo.getUuid() + " error", e);
             routingContext.response().end(error(e), CHARSET_NAME);
@@ -242,7 +253,7 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.response().end(error("not find convert util"), CHARSET_NAME);
             return;
         }
-        Ext ext = CrtrUtils.ext(transmitConfig.getExtCode());
+        Ext ext = transmitConfig.getExt();
         try {
             //原始请求参数
             Map<String, Object> requestMap = routerVo.getRequestMap();

@@ -14,7 +14,7 @@ public interface Ext {
     /**
      * 插件. 可扩展
      */
-    List<Ext> EXT_LIST = new ArrayList();
+    List<? extends Ext> EXT_LIST = new ArrayList();
 
     /**
      * @param extCode
@@ -28,6 +28,15 @@ public interface Ext {
      * @return
      */
     String getCode();
+
+
+    /**
+     * 转发接口的配置参数
+     *
+     * @param transmitJson
+     */
+    void setConfig(Map<String, Object> transmitJson);
+
 
     /**
      * 获取请求体后
@@ -56,4 +65,12 @@ public interface Ext {
      * @return
      */
     void afterResponse(String value, Map<String, Object> valueMap) throws Exception;
+
+    /**
+     * 获取特定的请求头
+     *
+     * @param value
+     * @return
+     */
+    Map<String, String> requestHeaders(String value) throws Exception;
 }

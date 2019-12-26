@@ -118,12 +118,12 @@ public class CrtrUtils {
     /**
      * 获取插件
      *
-     * @param signCode
+     * @param extCode
      * @return
      */
-    public static Ext ext(String signCode) {
+    public static Ext ext(String extCode) {
         for (Ext ext : Ext.EXT_LIST) {
-            if (ext.support(signCode)) {
+            if (ext.support(extCode)) {
                 return ext;
             }
         }

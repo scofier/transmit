@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt.transmit;
 
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
+import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import io.vertx.core.http.HttpMethod;
 import lombok.Data;
 import lombok.Getter;
@@ -36,9 +37,9 @@ public class TransmitConfig {
     private String code;
 
     /**
-     * 插件编号
+     * 插件实例
      */
-    private String extCode;
+    private Ext ext;
 
     /**
      * 是否缓存模板文件

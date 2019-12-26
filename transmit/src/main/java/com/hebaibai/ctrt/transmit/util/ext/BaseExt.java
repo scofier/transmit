@@ -1,11 +1,14 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 基础的插件
  */
 public class BaseExt implements Ext {
+
+    private Map<String, Object> transmitConfig;
 
     /**
      * extCode isBlank => true
@@ -24,17 +27,27 @@ public class BaseExt implements Ext {
     }
 
     @Override
+    public void setConfig(Map<String, Object> transmitConfig) {
+        this.transmitConfig = transmitConfig;
+    }
+
+    @Override
     public void beforRequestConvert(String value, Map<String, Object> valueMap) throws Exception {
 
     }
 
     @Override
-    public String beforRequest(String value, Map<String, Object> valueMap) {
+    public String beforRequest(String value, Map<String, Object> valueMap) throws Exception {
         return value;
     }
 
     @Override
-    public void afterResponse(String value, Map<String, Object> valueMap) {
+    public void afterResponse(String value, Map<String, Object> valueMap) throws Exception {
 
+    }
+
+    @Override
+    public Map<String, String> requestHeaders(String value) throws Exception {
+        return new HashMap<>();
     }
 }

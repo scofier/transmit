@@ -248,7 +248,15 @@ public class Main {
             transmitConfig.setConfigType(TransmitConfig.ConfigType.API);
             JSONObject api = transmitJson.getJSONObject("api");
             transmitConfig.setApiPath(getStringConfig(api.getString("url")));
-            transmitConfig.setExtCode(api.getString("extCode"));
+            //加载插件
+            String extCode = api.getString("extCode");
+            Ext ext = CrtrUtils.ext(extCode);
+            Class<? extends Ext> extClass = ext.getClass();
+            //实例化新的插件对象
+            Ext extInstance = extClass.newInstance();
+            //将当前配置设置进插件
+            extInstance.setConfig(transmitJson);
+            transmitConfig.setExt(extInstance);
             //接口调用超时时间， 默认3秒
             int timeout = 3000;
             if (api.containsKey("timeout")) {

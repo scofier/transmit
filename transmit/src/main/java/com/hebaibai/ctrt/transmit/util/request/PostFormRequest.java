@@ -7,10 +7,12 @@ import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.impl.headers.VertxHttpHeaders;
 import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -33,7 +35,14 @@ public class PostFormRequest implements Request {
      * @param handler
      */
     @Override
-    public void request(WebClient client, String param, String path, int timeout, Handler<AsyncResult<HttpResponse<Buffer>>> handler) {
+    public void request(
+            WebClient client,
+            Map<String, String> headers,
+            String param,
+            String path,
+            int timeout,
+            Handler<AsyncResult<HttpResponse<Buffer>>> handler
+    ) {
         Scanner scanner = new Scanner(param);
         MultiMap body = MultiMap.caseInsensitiveMultiMap();
         while (scanner.hasNext()) {
@@ -50,8 +59,11 @@ public class PostFormRequest implements Request {
                 body.add(key, "");
             }
         }
+        VertxHttpHeaders httpHeaders = new VertxHttpHeaders();
+        httpHeaders.addAll(headers);
         client.requestAbs(HttpMethod.POST, path)
                 .putHeader(CONTENT_TYPE, "application/x-www-form-urlencoded")
+                .putHeaders(httpHeaders)
                 .timeout(timeout)
                 .sendForm(body, handler);
     }
