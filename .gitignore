@@ -21,3 +21,13 @@ log/
 
 fnbx-ext/
 
+
+transmit-config/.settings/
+
+transmit-config/.classpath
+
+transmit-config/.factorypath
+
+transmit-config/.project
+
+transmit-config/src/test/
