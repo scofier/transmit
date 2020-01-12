@@ -14,7 +14,7 @@ public interface Ext {
     /**
      * 插件. 可扩展
      */
-    List<? extends Ext> EXT_LIST = new ArrayList();
+    List<Ext> EXT_LIST = new ArrayList();
 
     /**
      * @param extCode

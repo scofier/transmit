@@ -11,6 +11,7 @@ import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
+import com.hebaibai.ctrt.transmit.util.ext.BaseExt;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import io.vertx.core.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
@@ -248,15 +249,6 @@ public class Main {
             transmitConfig.setConfigType(TransmitConfig.ConfigType.API);
             JSONObject api = transmitJson.getJSONObject("api");
             transmitConfig.setApiPath(getStringConfig(api.getString("url")));
-            //加载插件
-            String extCode = api.getString("extCode");
-            Ext ext = CrtrUtils.ext(extCode);
-            Class<? extends Ext> extClass = ext.getClass();
-            //实例化新的插件对象
-            Ext extInstance = extClass.newInstance();
-            //将当前配置设置进插件
-            extInstance.setConfig(transmitJson);
-            transmitConfig.setExt(extInstance);
             //接口调用超时时间， 默认3秒
             int timeout = 3000;
             if (api.containsKey("timeout")) {
@@ -274,6 +266,15 @@ public class Main {
             String responseFtlPath = getStringConfig(api.getString("response-ftl"));
             transmitConfig.setApiResFtlPath(responseFtlPath);
             transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
+            //加载插件
+            String extCode = api.getString("extCode");
+            Ext ext = CrtrUtils.ext(extCode);
+            Class<? extends Ext> extClass = ext.getClass();
+            //实例化新的插件对象
+            Ext extInstance = extClass.newInstance();
+            //将当前配置设置进插件
+            extInstance.setConfig(transmitJson);
+            transmitConfig.setExt(extInstance);
         }
         //text配置
         else if (transmitJson.containsKey("text")) {
@@ -282,6 +283,7 @@ public class Main {
             String responseFtlPath = getStringConfig(page.getString("response-ftl"));
             transmitConfig.setApiResFtlPath(responseFtlPath);
             transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
+            transmitConfig.setExt(new BaseExt());
         }
 
         return transmitConfig;
