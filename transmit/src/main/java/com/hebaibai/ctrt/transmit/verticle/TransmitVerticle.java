@@ -13,9 +13,7 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.*;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
@@ -53,7 +51,11 @@ public class TransmitVerticle extends AbstractVerticle {
     public void init(Vertx vertx, Context context) {
         super.init(vertx, context);
         httpServer = vertx.createHttpServer();
-        this.webClient = WebClient.create(vertx);
+        //适配https
+        HttpClientOptions httpOptions = new HttpClientOptions();
+        httpOptions.setSsl(true).setVerifyHost(false).setTrustAll(true);
+        HttpClient httpClient = vertx.createHttpClient(httpOptions);
+        this.webClient = WebClient.wrap(httpClient);
     }
 
     @Override
