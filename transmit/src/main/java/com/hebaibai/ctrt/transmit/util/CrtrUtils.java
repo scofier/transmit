@@ -5,6 +5,7 @@ import com.hebaibai.ctrt.convert.freemarker.Regular;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.util.convert.BaseConvert;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
+import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import com.hebaibai.ctrt.transmit.util.param.*;
 import com.hebaibai.ctrt.transmit.util.request.*;
 import com.hebaibai.ctrt.transmit.util.ext.BaseExt;
@@ -122,7 +123,7 @@ public class CrtrUtils {
      * @return
      */
     public static Ext ext(String extCode) {
-        for (Ext ext : Ext.EXT_LIST) {
+        for (Ext ext : Exts.EXT_LIST) {
             if (ext.support(extCode)) {
                 return ext;
             }

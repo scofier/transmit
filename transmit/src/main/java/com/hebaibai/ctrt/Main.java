@@ -13,6 +13,7 @@ import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.ext.BaseExt;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
+import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import io.vertx.core.http.HttpMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
@@ -181,7 +182,7 @@ public class Main {
                 System.exit(0);
             }
         }
-        for (Ext extObj : Ext.EXT_LIST) {
+        for (Ext extObj : Exts.EXT_LIST) {
             log.info("load ext code {}", extObj.getCode());
         }
     }

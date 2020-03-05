@@ -12,11 +12,6 @@ import java.util.Map;
 public interface Ext {
 
     /**
-     * 插件. 可扩展
-     */
-    List<Ext> EXT_LIST = new ArrayList();
-
-    /**
      * @param extCode
      * @return
      */
