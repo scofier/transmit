@@ -110,14 +110,14 @@ public class TransmitVerticle extends AbstractVerticle {
             routerVo.setBody(requestBody);
             routerVo.setPath(path);
             routerVo.setTypeCode(transmitConfig.getCode());
-            log.info("request {} befor:\n {}", routerVo.getUuid(), requestBody);
+            log.info("request {} befor:\n{}", routerVo.getUuid(), requestBody);
             //API类型保存请求记录
             if (transmitConfig.getConfigType() == TransmitConfig.ConfigType.API) {
                 eventBus.send(DataBaseVerticle.EXECUTE_SQL_INSERT, routerVo.getInsertJsonStr());
             }
             try {
                 Map<String, Object> requestMap = param.params(routerVo);
-                log.info("request {} requestMap:\n {}", routerVo.getUuid(), requestMap);
+                log.info("request {} requestMap:\n{}", routerVo.getUuid(), requestMap);
                 routerVo.setRequestMap(requestMap);
                 //插件,获取请求体后,转换参数格式前
                 ext.beforRequestConvert(routerVo.getBody(), requestMap);
@@ -155,11 +155,11 @@ public class TransmitVerticle extends AbstractVerticle {
         try {
             //执行数据转换,使其符合目标接口
             String apiReqFtlText = transmitConfig.getApiReqFtlText();
-            log.debug("request {} ftl:\n {}", routerVo.getUuid(), apiReqFtlText);
+            log.debug("request {} ftl:\n{}", routerVo.getUuid(), apiReqFtlText);
             String value = convert.convert(requestMap, apiReqFtlText, transmitConfig.getCode() + "-REQ");
             //插件, 数据转换后, 请求接口前
             value = ext.beforRequest(value, requestMap);
-            log.info("request {} after:\n {}", routerVo.getUuid(), value);
+            log.info("request {} after:\n{}", routerVo.getUuid(), value);
             //更新body
             routerVo.setBody(value);
             routingContext.put(RouterVo.class.getName(), routerVo);
@@ -237,7 +237,7 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndReturn(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        log.info("response {} befor:\n {}", routerVo.getUuid(), routerVo.getBody());
+        log.info("response {} befor:\n{}", routerVo.getUuid(), routerVo.getBody());
         Param param = null;
         if (transmitConfig.getConfigType() == TransmitConfig.ConfigType.API) {
             //API方式, 以POST方式, 和配置中的接口返回类型中获取参数
@@ -266,9 +266,9 @@ public class TransmitVerticle extends AbstractVerticle {
             //插件, 请求接口后, 转换响应前
             ext.afterResponse(routerVo.getBody(), responseMap);
             String apiResFtlText = transmitConfig.getApiResFtlText();
-            log.debug("response {} ftl:\n {}", routerVo.getUuid(), apiResFtlText);
+            log.debug("response {} ftl:\n{}", routerVo.getUuid(), apiResFtlText);
             String value = convert.convert(responseMap, apiResFtlText, transmitConfig.getCode() + "-RES");
-            log.info("response {} after:\n {}", routerVo.getUuid(), value);
+            log.info("response {} after:\n{}", routerVo.getUuid(), value);
             //返回响应结果
             String ContentType = transmitConfig.getResType().val();
             routingContext.response().putHeader("Content-Type", ContentType);
