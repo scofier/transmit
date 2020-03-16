@@ -65,8 +65,9 @@ public interface Ext {
     /**
      * 自定义请求方式
      *
+     * @param value 转换完成的请求参数
      * @return
      */
-    AsyncResult<String> getApiResult();
+    AsyncResult<String> getApiResult(String value);
 
 }

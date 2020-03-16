@@ -48,7 +48,7 @@ public class BaseExt implements Ext {
     }
 
     @Override
-    public AsyncResult<String> getApiResult() {
+    public AsyncResult<String> getApiResult(String value) {
         return null;
     }
 }

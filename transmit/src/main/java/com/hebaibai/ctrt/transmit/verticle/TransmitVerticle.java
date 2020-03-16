@@ -210,7 +210,7 @@ public class TransmitVerticle extends AbstractVerticle {
                     }
                 }
             };
-            AsyncResult<String> apiResult = ext.getApiResult();
+            AsyncResult<String> apiResult = ext.getApiResult(value);
             if (apiResult != null) {
                 handler.handle(apiResult);
             } else {
