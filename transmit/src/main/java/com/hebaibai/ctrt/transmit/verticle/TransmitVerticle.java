@@ -9,9 +9,7 @@ import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.Param;
 import com.hebaibai.ctrt.transmit.util.Request;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Context;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
 import io.vertx.ext.web.Router;
@@ -23,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
@@ -193,35 +190,32 @@ public class TransmitVerticle extends AbstractVerticle {
         }
         Ext ext = transmitConfig.getExt();
         try {
-            //请求接口前, 获取请求头
-            Map<String, String> requestHeaders = ext.requestHeaders(value);
-            if (requestHeaders == null) {
-                requestHeaders = new HashMap<>();
+            //请求相应结果处理器
+            Handler<AsyncResult<String>> handler = asyncResult -> {
+                if (!asyncResult.succeeded()) {
+                    routingContext.response().end(error(asyncResult.cause()), CHARSET_NAME);
+                }
+                //响应数据
+                else {
+                    String body = asyncResult.result();
+                    if (StringUtils.isBlank(body)) {
+                        log.error("request " + routerVo.getUuid() + " error no response body");
+                        routingContext.response().end(error("no response body"), CHARSET_NAME);
+                    } else {
+                        //更新body中的值, 设置为接口返回值
+                        routerVo.setBody(body);
+                        //保存接口返回参数
+                        eventBus.send(DataBaseVerticle.EXECUTE_SQL_UPDATE, routerVo.getUpdateJsonStr());
+                        routingContext.next();
+                    }
+                }
+            };
+            AsyncResult<String> apiResult = ext.getApiResult();
+            if (apiResult != null) {
+                handler.handle(apiResult);
+            } else {
+                request.request(webClient, transmitConfig, value, handler);
             }
-            request.request(
-                    webClient, requestHeaders, value,
-                    transmitConfig.getApiPath(),
-                    transmitConfig.getTimeout(),
-                    event -> {
-                        if (!event.succeeded()) {
-                            routingContext.response().end(error(event.cause()), CHARSET_NAME);
-                        }
-                        //响应数据
-                        else {
-                            String body = event.result().bodyAsString(CHARSET_NAME);
-                            if (StringUtils.isBlank(body)) {
-                                log.error("request " + routerVo.getUuid() + " error no response body");
-                                routingContext.response().end(error("no response body"), CHARSET_NAME);
-                                return;
-                            }
-                            //更新body中的值, 设置为接口返回值
-                            routerVo.setBody(body);
-                            //保存接口返回参数
-                            eventBus.send(DataBaseVerticle.EXECUTE_SQL_UPDATE, routerVo.getUpdateJsonStr());
-                            routingContext.next();
-                        }
-                        return;
-                    });
         } catch (Exception e) {
             log.error("request " + routerVo.getUuid() + " error", e);
             routingContext.response().end(error(e), CHARSET_NAME);

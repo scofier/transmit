@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
-import java.util.ArrayList;
-import java.util.List;
+import io.vertx.core.AsyncResult;
+
 import java.util.Map;
 
 /**
@@ -26,7 +26,8 @@ public interface Ext {
 
 
     /**
-     * 转发接口的配置参数
+     * 设置参数
+     * 并初始化插件
      *
      * @param transmitJson
      */
@@ -62,10 +63,10 @@ public interface Ext {
     void afterResponse(String value, Map<String, Object> valueMap) throws Exception;
 
     /**
-     * 获取特定的请求头
+     * 自定义请求方式
      *
-     * @param value
      * @return
      */
-    Map<String, String> requestHeaders(String value) throws Exception;
+    AsyncResult<String> getApiResult();
+
 }

@@ -1,18 +1,17 @@
 package com.hebaibai.ctrt.transmit.util.request;
 
 import com.hebaibai.ctrt.transmit.DataType;
+import com.hebaibai.ctrt.transmit.TransmitConfig;
+import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.Request;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.impl.headers.VertxHttpHeaders;
-import io.vertx.ext.web.client.HttpResponse;
 import io.vertx.ext.web.client.WebClient;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -26,23 +25,15 @@ public class PostFormRequest implements Request {
     }
 
     /**
-     * @param client
-     * @param param   key1=value1
-     *                key2=value2
-     *                ...
-     * @param path
-     * @param timeout
+     * @param webClient
+     * @param transmitConfig
+     * @param param          key1=value1
+     *                       key2=value2
+     *                       ...
      * @param handler
      */
     @Override
-    public void request(
-            WebClient client,
-            Map<String, String> headers,
-            String param,
-            String path,
-            int timeout,
-            Handler<AsyncResult<HttpResponse<Buffer>>> handler
-    ) {
+    public void request(WebClient webClient, TransmitConfig transmitConfig, String param, Handler<AsyncResult<String>> handler) {
         Scanner scanner = new Scanner(param);
         MultiMap body = MultiMap.caseInsensitiveMultiMap();
         while (scanner.hasNext()) {
@@ -59,12 +50,15 @@ public class PostFormRequest implements Request {
                 body.add(key, "");
             }
         }
-        VertxHttpHeaders httpHeaders = new VertxHttpHeaders();
-        httpHeaders.addAll(headers);
-        client.requestAbs(HttpMethod.POST, path)
+        webClient.requestAbs(HttpMethod.POST, transmitConfig.getApiPath())
                 .putHeader(CONTENT_TYPE, "application/x-www-form-urlencoded")
-                .putHeaders(httpHeaders)
-                .timeout(timeout)
-                .sendForm(body, handler);
+                .timeout(transmitConfig.getTimeout())
+                .sendForm(body, asyncResult -> {
+                    if (asyncResult.succeeded()) {
+                        handler.handle(Future.succeededFuture(asyncResult.result().bodyAsString(CrtrUtils.CHARSET_NAME)));
+                    } else {
+                        handler.handle(Future.failedFuture(asyncResult.cause()));
+                    }
+                });
     }
 }

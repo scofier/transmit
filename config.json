@@ -1,7 +1,9 @@
 {
   "config": {
     "port": 8080,
-    "cache": false
+    "cache": false,
+    "ext": [
+    ]
   },
   "test": {
     "doc": "测试",
@@ -13,10 +15,10 @@
     },
     "api": {
       "timeout": 10000,
-      "url": "http://127.0.0.1:8080/text",
-      "method": "POST",
-      "request-type": "TEXT",
-      "response-type": "JSON",
+      "url": "https://www.pubmi.cn/",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "TEXT",
       "request-ftl": "send.ftl",
       "response-ftl": "result.ftl"
     }

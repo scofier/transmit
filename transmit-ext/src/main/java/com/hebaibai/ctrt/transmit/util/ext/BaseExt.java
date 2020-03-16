@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
-import java.util.HashMap;
+import io.vertx.core.AsyncResult;
+
 import java.util.Map;
 
 /**
@@ -47,7 +48,7 @@ public class BaseExt implements Ext {
     }
 
     @Override
-    public Map<String, String> requestHeaders(String value) throws Exception {
-        return new HashMap<>();
+    public AsyncResult<String> getApiResult() {
+        return null;
     }
 }
