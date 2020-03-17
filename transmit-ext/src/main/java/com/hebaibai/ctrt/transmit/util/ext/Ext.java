@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
-import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 
 import java.util.Map;
 
@@ -68,6 +69,6 @@ public interface Ext {
      * @param value 转换完成的请求参数
      * @return
      */
-    AsyncResult<String> getApiResult(String value);
+    Handler<Promise<String>> getApiResult(String value);
 
 }

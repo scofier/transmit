@@ -44,6 +44,8 @@ public class TransmitVerticle extends AbstractVerticle {
 
     private EventBus eventBus;
 
+    private WorkerExecutor extApiWorker;
+
     @Override
     public void init(Vertx vertx, Context context) {
         super.init(vertx, context);
@@ -53,6 +55,7 @@ public class TransmitVerticle extends AbstractVerticle {
         httpOptions.setSsl(true).setVerifyHost(false).setTrustAll(true);
         HttpClient httpClient = vertx.createHttpClient(httpOptions);
         this.webClient = WebClient.wrap(httpClient);
+        extApiWorker = vertx.createSharedWorkerExecutor("ext-api-worker-executor");
     }
 
     @Override
@@ -210,9 +213,9 @@ public class TransmitVerticle extends AbstractVerticle {
                     }
                 }
             };
-            AsyncResult<String> apiResult = ext.getApiResult(value);
+            Handler<Promise<String>> apiResult = ext.getApiResult(value);
             if (apiResult != null) {
-                handler.handle(apiResult);
+                extApiWorker.executeBlocking(apiResult, handler);
             } else {
                 request.request(webClient, transmitConfig, value, handler);
             }

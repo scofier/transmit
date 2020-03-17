@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
-import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 
 import java.util.Map;
 
@@ -48,7 +49,7 @@ public class BaseExt implements Ext {
     }
 
     @Override
-    public AsyncResult<String> getApiResult(String value) {
+    public Handler<Promise<String>> getApiResult(String value) {
         return null;
     }
 }
