@@ -279,10 +279,11 @@ public class TransmitVerticle extends AbstractVerticle {
         }
         Ext ext = transmitConfig.getExt();
         try {
-            //原始请求参数
+            //请求参数
             Map<String, Object> requestMap = routerVo.getRequestMap();
-            //原始请求结果
+            //api响应结果
             Map<String, Object> responseMap = param.params(routerVo);
+            log.info("request {} responseMap:\n{}", routerVo.getUuid(), responseMap);
             //组合参数
             responseMap.put("REQUEST", requestMap.get(DataReader.ROOT_NAME));
             //经过插件处理后的,api的响应结果
