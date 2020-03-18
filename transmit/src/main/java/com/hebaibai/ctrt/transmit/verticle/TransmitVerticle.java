@@ -130,7 +130,6 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.response().end(error("not find param util"), CHARSET_NAME);
             return;
         }
-        Ext ext = transmitConfig.getExt();
         request.bodyHandler(event -> {
             String requestBody = event.toString(CHARSET_NAME);
             RouterVo routerVo = new RouterVo();
@@ -149,8 +148,6 @@ public class TransmitVerticle extends AbstractVerticle {
                 Map<String, Object> requestMap = param.params(routerVo);
                 log.info("request {} requestMap:\n{}", routerVo.getUuid(), requestMap);
                 routerVo.setRequestMap(requestMap);
-                //插件,获取请求体后,转换参数格式前
-                ext.beforRequestConvert(routerVo.getBody(), requestMap);
             } catch (Exception e) {
                 log.error("request " + routerVo.getUuid() + " error", e);
                 routingContext.response().end(error(e), CHARSET_NAME);
@@ -169,9 +166,6 @@ public class TransmitVerticle extends AbstractVerticle {
     private void processData(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        Ext ext = transmitConfig.getExt();
-        //原始请求中的参数
-        Map<String, Object> requestMap = routerVo.getRequestMap();
         Convert convert = CrtrUtils.convert(transmitConfig.getReqType(), transmitConfig.getApiReqType());
         if (convert == null) {
             routingContext.response().end(error("not find convert util"), CHARSET_NAME);
@@ -182,13 +176,15 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.next();
             return;
         }
+        //插件,获取请求体后,转换参数格式前
+        Ext ext = transmitConfig.getExt();
         try {
-            //执行数据转换,使其符合目标接口
+            //经过插件处理后的,原始请求中的参数
+            Map<String, Object> requestMap = ext.outRequestBodyMap(routerVo.getBody(), routerVo.getRequestMap());
+            //获取转换模板并转换数据
             String apiReqFtlText = transmitConfig.getApiReqFtlText();
             log.debug("request {} ftl:\n{}", routerVo.getUuid(), apiReqFtlText);
             String value = convert.convert(requestMap, apiReqFtlText, transmitConfig.getCode() + "-REQ");
-            //插件, 数据转换后, 请求接口前
-            value = ext.beforRequest(value, requestMap);
             log.info("request {} after:\n{}", routerVo.getUuid(), value);
             //更新body
             routerVo.setBody(value);
@@ -291,7 +287,8 @@ public class TransmitVerticle extends AbstractVerticle {
             //组合参数
             responseMap.put("REQUEST", requestMap.get(DataReader.ROOT_NAME));
             //插件, 请求接口后, 转换响应前
-            ext.afterResponse(routerVo.getBody(), responseMap);
+            responseMap = ext.apiResponseBodyMap(routerVo.getBody(), responseMap);
+            //获取转换模板并转换数据
             String apiResFtlText = transmitConfig.getApiResFtlText();
             log.debug("response {} ftl:\n{}", routerVo.getUuid(), apiResFtlText);
             String value = convert.convert(responseMap, apiResFtlText, transmitConfig.getCode() + "-RES");

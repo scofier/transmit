@@ -32,36 +32,34 @@ public interface Ext {
      *
      * @param transmitJson
      */
-    void setConfig(Map<String, Object> transmitJson);
+    void init(Map<String, Object> transmitJson);
 
 
     /**
-     * 获取请求体后
-     * 转换参数格式前
+     * 收到第三方系统请求后
+     * 将收到的数据处理后,返回一个Map,
+     * 在接下来的步骤中由freemarker处理成api接口中的报文
      *
      * @param value    请求体中的数据
-     * @param valueMap 原始数据(放进freemarker的数据)
+     * @param valueMap 原始数据经过解析后得到的map(放进freemarker的数据)
      * @return
      */
-    void beforRequestConvert(String value, Map<String, Object> valueMap) throws Exception;
+    Map<String, Object> outRequestBodyMap(String value, Map<String, Object> valueMap) throws Exception;
+
 
     /**
-     * 在api请求前前执行
+     * 收到API接口的返回值后
+     * 将收到的数据处理后,返回一个Map,
+     * 在接下来的步骤中由freemarker处理成第三方系统的响应报文
      *
-     * @param value    使用模板转换后的数据
-     * @param valueMap 原始数据(放进freemarker的数据)
-     * @return 插件处理后的数据
-     */
-    String beforRequest(String value, Map<String, Object> valueMap) throws Exception;
-
-    /**
-     * 在api响应后执行
-     *
-     * @param value    使用模板转换后的数据
-     * @param valueMap 原始数据(放进freemarker的数据)
+     * @param value
+     * @param valueMap:{ ROOT:     api接口返回数据
+     *                   REQUEST:  第三方系统的请求数据
+     *                   }
      * @return
+     * @throws Exception
      */
-    void afterResponse(String value, Map<String, Object> valueMap) throws Exception;
+    Map<String, Object> apiResponseBodyMap(String value, Map<String, Object> valueMap) throws Exception;
 
     /**
      * 自定义请求方式

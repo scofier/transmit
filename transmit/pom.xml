@@ -6,7 +6,7 @@
 
     <groupId>com.hebaibai</groupId>
     <artifactId>transmit</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>1.2-SNAPSHOT</version>
 
     <properties>
         <vertx-version>3.8.0</vertx-version>
@@ -25,7 +25,7 @@
         <dependency>
             <groupId>com.hebaibai</groupId>
             <artifactId>transmit-ext</artifactId>
-            <version>1.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

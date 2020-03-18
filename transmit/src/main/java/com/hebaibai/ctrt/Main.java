@@ -274,7 +274,7 @@ public class Main {
             //实例化新的插件对象
             Ext extInstance = extClass.newInstance();
             //将当前配置设置进插件
-            extInstance.setConfig(transmitJson);
+            extInstance.init(transmitJson);
             transmitConfig.setExt(extInstance);
         }
         //text配置
@@ -284,7 +284,7 @@ public class Main {
             String responseFtlPath = getStringConfig(page.getString("response-ftl"));
             transmitConfig.setApiResFtlPath(responseFtlPath);
             transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
-            transmitConfig.setExt(new BaseExt());
+            transmitConfig.setExt(CrtrUtils.BASE_EXT);
         }
 
         return transmitConfig;

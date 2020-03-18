@@ -35,7 +35,10 @@ public class CrtrUtils {
         put("has", new Has());
     }};
 
-    private static final Ext BASE_EXT = new BaseExt();
+    /**
+     * 默认插件
+     */
+    public static final Ext BASE_EXT = new BaseExt();
 
 
     /**
