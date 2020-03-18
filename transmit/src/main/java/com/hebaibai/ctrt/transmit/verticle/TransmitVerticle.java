@@ -176,7 +176,6 @@ public class TransmitVerticle extends AbstractVerticle {
             routingContext.next();
             return;
         }
-        //插件,获取请求体后,转换参数格式前
         Ext ext = transmitConfig.getExt();
         try {
             //经过插件处理后的,原始请求中的参数
@@ -286,7 +285,7 @@ public class TransmitVerticle extends AbstractVerticle {
             Map<String, Object> responseMap = param.params(routerVo);
             //组合参数
             responseMap.put("REQUEST", requestMap.get(DataReader.ROOT_NAME));
-            //插件, 请求接口后, 转换响应前
+            //经过插件处理后的,api的响应结果
             responseMap = ext.apiResponseBodyMap(routerVo.getBody(), responseMap);
             //获取转换模板并转换数据
             String apiResFtlText = transmitConfig.getApiResFtlText();
