@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
 
@@ -33,18 +34,42 @@ import static com.hebaibai.ctrt.transmit.util.CrtrUtils.CHARSET_NAME;
 @Slf4j
 public class TransmitVerticle extends AbstractVerticle {
 
-
+    /**
+     * 启动配置
+     */
     @Getter
     @Setter
     private Config config;
 
+    /**
+     * 接收请求
+     */
     private HttpServer httpServer;
 
+    /**
+     * 执行http请求
+     */
     private WebClient webClient;
 
+    /**
+     * 事件总线, 用于保存请求记录
+     */
     private EventBus eventBus;
 
-    private WorkerExecutor extApiWorker;
+    /**
+     * 执行ext中的阻塞方法
+     */
+    private WorkerExecutor extWorkerExecutor;
+
+    /**
+     * extWorkerExecutor线程池大小, 默认核心数量*2
+     */
+    private static int EXT_WORKER_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
+
+    /**
+     * extWorkerExecutor执行阻塞方法的超时时间 默认10秒
+     */
+    private static int EXT_WORKER_MAX_EXECUTE_TIME = 10;
 
     @Override
     public void init(Vertx vertx, Context context) {
@@ -55,7 +80,12 @@ public class TransmitVerticle extends AbstractVerticle {
         httpOptions.setSsl(true).setVerifyHost(false).setTrustAll(true);
         HttpClient httpClient = vertx.createHttpClient(httpOptions);
         this.webClient = WebClient.wrap(httpClient);
-        extApiWorker = vertx.createSharedWorkerExecutor("ext-api-worker-executor");
+        extWorkerExecutor = vertx.createSharedWorkerExecutor(
+                "ext-api-worker-executor",
+                EXT_WORKER_POOL_SIZE,
+                EXT_WORKER_MAX_EXECUTE_TIME,
+                TimeUnit.SECONDS
+        );
     }
 
     @Override
@@ -215,7 +245,7 @@ public class TransmitVerticle extends AbstractVerticle {
             };
             Handler<Promise<String>> apiResult = ext.getApiResult(value);
             if (apiResult != null) {
-                extApiWorker.executeBlocking(apiResult, handler);
+                extWorkerExecutor.executeBlocking(apiResult, handler);
             } else {
                 request.request(webClient, transmitConfig, value, handler);
             }
