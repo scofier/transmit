@@ -91,6 +91,9 @@ public class TransmitVerticle extends AbstractVerticle {
     @Override
     public void start() {
         Router router = Router.router(vertx);
+        //根据请求,查找配置
+        router.route().handler(this::requestConfig);
+        //接收数据
         router.route().handler(this::requestBody);
         //处理数据 或者 返回页面并结束
         router.route().handler(this::processData);
@@ -109,36 +112,48 @@ public class TransmitVerticle extends AbstractVerticle {
     }
 
     /**
-     * 获取转换所需要的数据
+     * 根据请求获取 请求配置
      *
      * @param routingContext
      */
-    private void requestBody(RoutingContext routingContext) {
+    private void requestConfig(RoutingContext routingContext) {
         HttpServerRequest request = routingContext.request();
         HttpMethod method = request.method();
         //去除重复的'/'符号
         String path = new File(request.path()).getPath();
-        TransmitConfig transmitConfig = config.get(method, path);
+        TransmitConfig transmitConfig = config.transmitConfig(method, path);
         //没有找到配置
         if (transmitConfig == null) {
             routingContext.response().end(error("not find config"), CHARSET_NAME);
             return;
         }
+        RouterVo routerVo = new RouterVo();
+        routerVo.setTransmitConfig(transmitConfig);
+        routerVo.setMethod(method);
+        routerVo.setParams(request.params());
+        routerVo.setPath(path);
+        routerVo.setTypeCode(transmitConfig.getCode());
+        routingContext.put(RouterVo.class.getName(), routerVo);
+        routingContext.next();
+    }
+
+    /**
+     * 获取转换所需要的数据
+     *
+     * @param routingContext
+     */
+    private void requestBody(RoutingContext routingContext) {
+        RouterVo routerVo = routingContext.get(RouterVo.class.getName());
+        TransmitConfig transmitConfig = routerVo.getTransmitConfig();
         //接受请求的参数
-        Param param = CrtrUtils.param(method, transmitConfig.getReqType());
+        Param param = CrtrUtils.param(routerVo.getMethod(), transmitConfig.getReqType());
         if (param == null) {
             routingContext.response().end(error("not find param util"), CHARSET_NAME);
             return;
         }
-        request.bodyHandler(event -> {
+        routingContext.request().bodyHandler(event -> {
             String requestBody = event.toString(CHARSET_NAME);
-            RouterVo routerVo = new RouterVo();
-            routerVo.setTransmitConfig(transmitConfig);
-            routerVo.setMethod(method);
-            routerVo.setParams(request.params());
             routerVo.setBody(requestBody);
-            routerVo.setPath(path);
-            routerVo.setTypeCode(transmitConfig.getCode());
             log.info("request {} befor:\n{}", routerVo.getUuid(), requestBody);
             //API类型保存请求记录
             if (transmitConfig.getConfigType() == TransmitConfig.ConfigType.API) {
