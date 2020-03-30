@@ -83,8 +83,6 @@ public class Config {
         JSONObject jsonObject = JSONObject.parseObject(fileText);
         //获取系统配置
         JSONObject configJson = jsonObject.getJSONObject("config");
-        //移出配置文件中的config节点
-        jsonObject.remove("config");
         initConfig(configJson);
         if (cache) {
             //加载所有的TransmitConfig配置
@@ -125,8 +123,6 @@ public class Config {
                 JSONObject configJson = jsonObject.getJSONObject("config");
                 //重新加载prop
                 initProp(configJson);
-                //移出配置文件中的config节点
-                jsonObject.remove("config");
                 //清除之前加载的配置
                 imports = new HashSet();
                 transmitConfigs = new HashSet();
@@ -145,7 +141,7 @@ public class Config {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error("{}", e);
             }
         }
         return null;
@@ -197,18 +193,22 @@ public class Config {
      * @param configJson
      */
     private void importAll(JSONObject configJson) throws Exception {
-        //主配置文件中的
-        addTransmitJson(configJson);
-        if (!configJson.containsKey("import")) {
-            return;
-        }
-        JSONArray importJsons = configJson.getJSONArray("import");
-        for (int i = 0; i < importJsons.size(); i++) {
-            String importFilePath = importJsons.getString(i);
-            imports.add(importFilePath);
-            String fileText = CrtrUtils.getFileText(importFilePath);
-            JSONObject jsonObject = JSONObject.parseObject(fileText);
-            addTransmitJson(jsonObject);
+        if (configJson.containsKey("config")) {
+            JSONObject config = configJson.getJSONObject("config");
+            configJson.remove("config");
+            if (!config.containsKey("import")) {
+                return;
+            }
+            JSONArray importJsons = config.getJSONArray("import");
+            for (int i = 0; i < importJsons.size(); i++) {
+                String importFilePath = importJsons.getString(i);
+                imports.add(importFilePath);
+                String fileText = CrtrUtils.getFileText(importFilePath);
+                JSONObject jsonObject = JSONObject.parseObject(fileText);
+                addTransmitJson(jsonObject);
+            }
+        } else {
+            addTransmitJson(configJson);
         }
     }
 
