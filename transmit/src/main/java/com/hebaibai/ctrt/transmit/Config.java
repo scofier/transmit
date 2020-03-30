@@ -85,6 +85,8 @@ public class Config {
         JSONObject configJson = jsonObject.getJSONObject("config");
         initConfig(configJson);
         if (cache) {
+            //加载prop
+            initProp(configJson);
             //加载所有的TransmitConfig配置
             importAll(jsonObject);
             //将所有的 json 配置转换为 TransmitConfig
