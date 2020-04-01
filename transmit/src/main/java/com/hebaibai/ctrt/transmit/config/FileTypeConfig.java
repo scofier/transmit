@@ -1,4 +1,4 @@
-package com.hebaibai.ctrt.transmit;
+package com.hebaibai.ctrt.transmit.config;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -6,9 +6,15 @@ import com.hebaibai.ctrt.convert.FreeMarkerFtl;
 import com.hebaibai.ctrt.convert.FreeMarkerUtils;
 import com.hebaibai.ctrt.convert.reader.DataReader;
 import com.hebaibai.ctrt.convert.reader.JsonDataReader;
+import com.hebaibai.ctrt.transmit.DataConfig;
+import com.hebaibai.ctrt.transmit.DataType;
+import com.hebaibai.ctrt.transmit.TransmitConfig;
+import com.hebaibai.ctrt.transmit.config.CrtrConfig;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import com.hebaibai.ctrt.transmit.util.ext.Exts;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +28,7 @@ import java.util.*;
  * @author hjx
  */
 @Slf4j
-public class Config {
+public class FileTypeConfig implements CrtrConfig {
 
     /**
      * 配置文件地址
@@ -32,7 +38,6 @@ public class Config {
     /**
      * 启动时监听的端口
      */
-    @Getter
     private int port;
 
     /**
@@ -41,13 +46,11 @@ public class Config {
      * 2: 转发配置
      * }
      */
-    @Getter
     private boolean cache;
 
     /**
      * 数据库配置
      */
-    @Getter
     private DataConfig dataConfig;
 
     /**
@@ -68,7 +71,6 @@ public class Config {
     /**
      * 配置中的属性
      */
-    @Getter
     private Object prop;
 
     /**
@@ -77,7 +79,7 @@ public class Config {
      * @param configFilePath
      * @throws IOException
      */
-    public Config(String configFilePath) throws Exception {
+    public FileTypeConfig(String configFilePath) throws Exception {
         this.configFilePath = configFilePath;
         String fileText = CrtrUtils.getFileText(configFilePath);
         JSONObject jsonObject = JSONObject.parseObject(fileText);
@@ -104,49 +106,53 @@ public class Config {
      * @param path
      * @return
      */
-    public TransmitConfig transmitConfig(HttpMethod method, String path) {
-        //开启缓存
-        if (cache) {
-            Iterator<TransmitConfig> iterator = transmitConfigs.iterator();
-            while (iterator.hasNext()) {
-                TransmitConfig next = iterator.next();
-                if (next.getReqMethod() == method && next.getReqPath().equals(path)) {
-                    return next;
-                }
-            }
-        }
-        //不使用缓存
-        else {
-            //重新读取配置文件
-            try {
-                String fileText = CrtrUtils.getFileText(this.configFilePath);
-                JSONObject jsonObject = JSONObject.parseObject(fileText);
-                //获取系统配置
-                JSONObject configJson = jsonObject.getJSONObject("config");
-                //重新加载prop
-                initProp(configJson);
-                //清除之前加载的配置
-                imports = new HashSet();
-                transmitConfigs = new HashSet();
-                transmitConfigMap = new HashMap<>();
-                //加载所有的配置
-                importAll(jsonObject);
-                for (Map.Entry<String, JSONObject> entry : transmitConfigMap.entrySet()) {
-                    JSONObject value = entry.getValue();
-                    JSONObject request = value.getJSONObject("request");
-                    if (request.containsKey("path") && request.containsKey("method")) {
-                        String pathStr = request.getString("path");
-                        String methodStr = request.getString("method");
-                        if (method == HttpMethod.valueOf(methodStr) && path.equals(pathStr)) {
-                            return initTransmitConfig(entry.getKey(), value);
-                        }
+    @Override
+    public Handler<Promise<TransmitConfig>> transmitConfig(HttpMethod method, String path) {
+        return event -> {
+            //开启缓存
+            if (cache) {
+                Iterator<TransmitConfig> iterator = transmitConfigs.iterator();
+                while (iterator.hasNext()) {
+                    TransmitConfig next = iterator.next();
+                    if (next.getReqMethod() == method && next.getReqPath().equals(path)) {
+                        event.complete(next);
                     }
                 }
-            } catch (Exception e) {
-                log.error("{}", e);
             }
-        }
-        return null;
+            //不使用缓存
+            else {
+                //重新读取配置文件
+                try {
+                    String fileText = CrtrUtils.getFileText(this.configFilePath);
+                    JSONObject jsonObject = JSONObject.parseObject(fileText);
+                    //获取系统配置
+                    JSONObject configJson = jsonObject.getJSONObject("config");
+                    //重新加载prop
+                    initProp(configJson);
+                    //清除之前加载的配置
+                    imports = new HashSet();
+                    transmitConfigs = new HashSet();
+                    transmitConfigMap = new HashMap<>();
+                    //加载所有的配置
+                    importAll(jsonObject);
+                    for (Map.Entry<String, JSONObject> entry : transmitConfigMap.entrySet()) {
+                        JSONObject value = entry.getValue();
+                        JSONObject request = value.getJSONObject("request");
+                        if (request.containsKey("path") && request.containsKey("method")) {
+                            String pathStr = request.getString("path");
+                            String methodStr = request.getString("method");
+                            if (method == HttpMethod.valueOf(methodStr) && path.equals(pathStr)) {
+                                TransmitConfig transmitConfig = initTransmitConfig(entry.getKey(), value);
+                                event.complete(transmitConfig);
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    event.fail(e);
+                }
+            }
+            event.fail("not find config  method: " + method + " path: " + path);
+        };
     }
 
     /**
@@ -373,6 +379,18 @@ public class Config {
         String responseType = request.getString("response-type");
         DataType dataType = DataType.valueOf(responseType.toUpperCase());
         return dataType;
+    }
+
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+
+    @Override
+    public DataConfig getDataConfig() {
+        return dataConfig;
     }
 
 }

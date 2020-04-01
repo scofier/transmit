@@ -1,38 +1,16 @@
 {
   "config": {
     "port": 9527,
-    "cache": false,
+    "cache": true,
+    "import": [
+      "/home/hjx/work/myprogect/transmit/import-config.json",
+      "/home/hjx/work/myprogect/transmit/import-config1.json"
+    ],
     "ext": [
-    ]
-  },
-  "test-request": {
-    "doc": "测试api",
-    "request": {
-      "path": "/test",
-      "method": "GET",
-      "request-type": "QUERY",
-      "response-type": "HTML"
-    },
-    "api": {
-      "timeout": 10000,
-      "url": "https://www.pubmi.cn/",
-      "method": "GET",
-      "request-type": "QUERY",
-      "response-type": "TEXT",
-      "request-ftl": "send.ftl",
-      "response-ftl": "result.ftl"
-    }
-  },
-  "text-page": {
-    "doc": "测试text",
-    "request": {
-      "path": "/text",
-      "method": "GET",
-      "request-type": "QUERY",
-      "response-type": "HTML"
-    },
-    "text": {
-      "response-ftl": "send.ftl"
+    ],
+    "prop": {
+      "api_url": "http://www.pubmi.cn/",
+      "api_xxx_url": "http://39.99.199.185:9100"
     }
   }
 }

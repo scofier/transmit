@@ -31,8 +31,8 @@ sh bin/start.sh
 │   ├── restart.sh
 │   ├── start.sh
 │   └── stop.sh
-├── config                      配置
-│   ├── config.json
+├── fileTypeConfig                      配置
+│   ├── fileTypeConfig.json
 │   └── logback.xml
 ├── lib
 │   ├── commons-cli-1.4.jar     依赖
@@ -60,7 +60,7 @@ sh bin/start.sh
 {
 
   其他配置
-  "config": {
+  "fileTypeConfig": {
     
     是否缓存模板文件,默认true. 关闭的话每次请求会重新加载配置.
     重新加载配置是指 除了port, cache, ext, db节点之外, 每次请求都会重新读所有配置文件(目的是为了方便开发, 线上请不要开启).
@@ -89,7 +89,7 @@ sh bin/start.sh
   },
   
   配置示例
-  "config-demo": {
+  "fileTypeConfig-demo": {
   
     接受请求
     "request": {
@@ -251,7 +251,7 @@ code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCo
 
 ```json
 {
-  "config": {
+  "fileTypeConfig": {
     "port": 8080,
     "cache": false
   },

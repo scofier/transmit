@@ -1,0 +1,20 @@
+{
+  "test-request": {
+    "doc": "测试api",
+    "request": {
+      "path": "/imp/test1",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "HTML"
+    },
+    "api": {
+      "timeout": 10000,
+      "url": "${api_url}",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "TEXT",
+      "request-ftl": "send.ftl",
+      "response-ftl": "result.ftl"
+    }
+  }
+}

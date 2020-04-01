@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt.transmit.verticle;
 
 import com.hebaibai.ctrt.convert.reader.DataReader;
-import com.hebaibai.ctrt.transmit.Config;
+import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import com.hebaibai.ctrt.transmit.RouterVo;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
 import com.hebaibai.ctrt.transmit.util.Convert;
@@ -15,7 +15,6 @@ import io.vertx.core.http.*;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -37,9 +36,8 @@ public class TransmitVerticle extends AbstractVerticle {
     /**
      * 启动配置
      */
-    @Getter
     @Setter
-    private Config config;
+    private FileTypeConfig fileTypeConfig;
 
     /**
      * 接收请求
@@ -102,7 +100,7 @@ public class TransmitVerticle extends AbstractVerticle {
         //转换响应数据,并发返回
         router.route().handler(this::convertAndReturn);
         //开启路由
-        httpServer.requestHandler(router).listen(config.getPort());
+        httpServer.requestHandler(router).listen(fileTypeConfig.getPort());
         //事件总线
         eventBus = vertx.eventBus();
     }
@@ -121,20 +119,23 @@ public class TransmitVerticle extends AbstractVerticle {
         HttpMethod method = request.method();
         //去除重复的'/'符号
         String path = new File(request.path()).getPath();
-        TransmitConfig transmitConfig = config.transmitConfig(method, path);
-        //没有找到配置
-        if (transmitConfig == null) {
-            routingContext.response().end(error("not find config"), CHARSET_NAME);
-            return;
-        }
-        RouterVo routerVo = new RouterVo();
-        routerVo.setTransmitConfig(transmitConfig);
-        routerVo.setMethod(method);
-        routerVo.setParams(request.params());
-        routerVo.setPath(path);
-        routerVo.setTypeCode(transmitConfig.getCode());
-        routingContext.put(RouterVo.class.getName(), routerVo);
-        routingContext.next();
+        Handler<Promise<TransmitConfig>> promiseHandler = fileTypeConfig.transmitConfig(method, path);
+        extWorkerExecutor.executeBlocking(promiseHandler, event -> {
+            if (!event.succeeded()) {
+                routingContext.response().end(error(event.cause()), CHARSET_NAME);
+                return;
+            } else {
+                TransmitConfig transmitConfig = event.result();
+                RouterVo routerVo = new RouterVo();
+                routerVo.setTransmitConfig(transmitConfig);
+                routerVo.setMethod(method);
+                routerVo.setParams(request.params());
+                routerVo.setPath(path);
+                routerVo.setTypeCode(transmitConfig.getCode());
+                routingContext.put(RouterVo.class.getName(), routerVo);
+                routingContext.next();
+            }
+        });
     }
 
     /**

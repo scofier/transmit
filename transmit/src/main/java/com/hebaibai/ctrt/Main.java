@@ -1,7 +1,7 @@
 package com.hebaibai.ctrt;
 
 
-import com.hebaibai.ctrt.transmit.Config;
+import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
@@ -24,7 +24,7 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         //获取配置文件内容
-        Config conf = getConf(args);
+        FileTypeConfig conf = getConf(args);
         //启动
         CtrtLancher ctrtLancher = new CtrtLancher();
         ctrtLancher.start(conf);
@@ -38,7 +38,7 @@ public class Main {
      * @return
      * @throws ParseException
      */
-    private static Config getConf(String[] args) throws Exception {
+    private static FileTypeConfig getConf(String[] args) throws Exception {
         Options options = new Options();
         options.addOption("c", "conf", true, "config file path");
         CommandLine parse = new BasicParser().parse(options, args);
@@ -48,8 +48,8 @@ public class Main {
             System.exit(0);
         }
         String conf = parse.getOptionValue("conf");
-        Config config = new Config(conf);
-        return config;
+        FileTypeConfig fileTypeConfig = new FileTypeConfig(conf);
+        return fileTypeConfig;
     }
 
 }

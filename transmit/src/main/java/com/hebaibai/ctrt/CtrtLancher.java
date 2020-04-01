@@ -1,6 +1,6 @@
 package com.hebaibai.ctrt;
 
-import com.hebaibai.ctrt.transmit.Config;
+import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.verticle.DataBaseVerticle;
 import com.hebaibai.ctrt.transmit.verticle.TransmitVerticle;
@@ -25,9 +25,9 @@ public class CtrtLancher {
 
     private List<String> verticleIds = new ArrayList<>();
 
-    public void start(Config config) {
+    public void start(FileTypeConfig fileTypeConfig) {
         TransmitVerticle transmitVerticle = new TransmitVerticle();
-        transmitVerticle.setConfig(config);
+        transmitVerticle.setFileTypeConfig(fileTypeConfig);
 
         //部署
         vertx.deployVerticle(transmitVerticle, res -> {
@@ -37,7 +37,7 @@ public class CtrtLancher {
         });
 
         //数据库部署
-        DataConfig dataConfig = config.getDataConfig();
+        DataConfig dataConfig = fileTypeConfig.getDataConfig();
         DataBaseVerticle dataBaseVerticle = new DataBaseVerticle();
         if (dataConfig != null) {
             AsyncSQLClient sqlClient = MySQLClient.createShared(
