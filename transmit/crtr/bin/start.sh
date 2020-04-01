@@ -9,9 +9,9 @@ cd ../
 DEPLOY_DIR=`pwd`
 
 # 项目配置文件
-CONFIG_FILE=$DEPLOY_DIR/fileTypeConfig/fileTypeConfig.json
+CONFIG_FILE=$DEPLOY_DIR/config/config.json
 # 日志配置文件
-LOG_FILE="-Dlogback.configurationFile=$DEPLOY_DIR/fileTypeConfig/logback.xml"
+LOG_FILE="-Dlogback.configurationFile=$DEPLOY_DIR/config/logback.xml"
 
 # lib
 LIB_DIR=$DEPLOY_DIR/lib

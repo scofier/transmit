@@ -33,10 +33,6 @@ public class CtrtLancher {
      * @throws Exception
      */
     public void start(String configFilePath) throws Exception {
-        //创建共享数据
-        Context context = vertx.getOrCreateContext();
-        context.put("config_file_path", configFilePath);
-
         TransmitVerticle transmitVerticle = new TransmitVerticle();
 
         CrtrConfig crtrConfig = new FileTypeConfig(vertx, configFilePath);

@@ -18,10 +18,6 @@ public class Exts {
      */
     private static Map<String, Ext> EXT_MAP = new HashMap<>();
 
-    static {
-        Exts.add("API_INFO", new ApiInfoExt());
-    }
-
     /**
      * 通过编号获取ext
      *

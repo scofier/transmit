@@ -10,21 +10,6 @@ import lombok.Data;
 @Data
 public class TransmitConfig {
 
-    public enum ConfigType {
-        /**
-         * 是一个api转发
-         */
-        API,
-        /**
-         * 是返回文字
-         */
-        TEXT
-    }
-
-    /**
-     * 配置类型, 默认为API
-     */
-    private ConfigType configType = ConfigType.API;
 
     /**
      * 配置编号

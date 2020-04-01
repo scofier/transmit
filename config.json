@@ -3,8 +3,8 @@
     "port": 9527,
     "cache": false,
     "import": [
-      "/home/hjx/work/myprogect/transmit/import-config.json",
-      "/home/hjx/work/myprogect/transmit/import-config1.json"
+      "transmit/page-config.json",
+      "transmit/api-config.json",
     ],
     "ext": [
     ],
@@ -14,7 +14,7 @@
     }
   },
   "api-info": {
-    "doc": "测试api-info",
+    "doc": "查看配置详情",
     "request": {
       "path": "/api",
       "method": "GET",
@@ -22,14 +22,8 @@
       "response-type": "JSON"
     },
     "api": {
-      "timeout": 10000,
       "extCode": "API_INFO",
-      "url": "http",
-      "method": "GET",
-      "request-type": "QUERY",
-      "response-type": "TEXT",
-      "request-ftl": "send.ftl",
-      "response-ftl": "result.ftl"
+      "response-ftl": "transmit/result.ftl"
     }
   }
 }

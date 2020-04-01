@@ -222,9 +222,8 @@ public class FileTypeConfig implements CrtrConfig {
                 JSONObject jsonObject = JSONObject.parseObject(fileText);
                 addTransmitJson(jsonObject);
             }
-        } else {
-            addTransmitJson(configJson);
         }
+        addTransmitJson(configJson);
     }
 
     /**
@@ -277,11 +276,11 @@ public class FileTypeConfig implements CrtrConfig {
         transmitConfig.setReqType(getRequestType(request));
         transmitConfig.setResType(getResponseType(request));
         transmitConfig.setReqPath(getStringConfig(path));
-        //api配置
-        if (transmitJson.containsKey("api")) {
-            transmitConfig.setConfigType(TransmitConfig.ConfigType.API);
-            JSONObject api = transmitJson.getJSONObject("api");
-            transmitConfig.setApiPath(getStringConfig(api.getString("url")));
+        JSONObject api = transmitJson.getJSONObject("api");
+        String url = api.getString("url");
+        //没有配置url时, 认为不需要调用接口
+        if (StringUtils.isNotBlank(url)) {
+            transmitConfig.setApiPath(getStringConfig(url));
             //接口调用超时时间， 默认3秒
             int timeout = 3000;
             if (api.containsKey("timeout")) {
@@ -294,23 +293,15 @@ public class FileTypeConfig implements CrtrConfig {
             //请求转换模板文件
             String requestFtlPath = getStringConfig(api.getString("request-ftl"));
             transmitConfig.setApiReqFtlText(CrtrUtils.getFileText(requestFtlPath));
-            //响应转换模板文件
-            String responseFtlPath = getStringConfig(api.getString("response-ftl"));
-            transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
-            //加载插件
-            String extCode = api.getString("extCode");
-            Ext ext = Exts.get(extCode);
-            ext.init(this.vertx, transmitJson);
-            transmitConfig.setExt(ext);
         }
-        //text配置
-        else if (transmitJson.containsKey("text")) {
-            transmitConfig.setConfigType(TransmitConfig.ConfigType.TEXT);
-            JSONObject page = transmitJson.getJSONObject("text");
-            String responseFtlPath = getStringConfig(page.getString("response-ftl"));
-            transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
-            transmitConfig.setExt(Exts.BASE_EXT);
-        }
+        //响应转换模板文件
+        String responseFtlPath = getStringConfig(api.getString("response-ftl"));
+        transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
+        //插件编号
+        String extCode = api.getString("extCode");
+        Ext ext = Exts.get(extCode);
+        ext.init(this.vertx, transmitJson);
+        transmitConfig.setExt(ext);
         return transmitConfig;
     }
 

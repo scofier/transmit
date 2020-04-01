@@ -2,6 +2,8 @@ package com.hebaibai.ctrt;
 
 
 import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
+import com.hebaibai.ctrt.transmit.ext.ApiInfoExt;
+import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.*;
 
@@ -14,6 +16,10 @@ import org.apache.commons.cli.*;
 @Slf4j
 public class Main {
 
+    static {
+        //注册插件
+        Exts.add("API_INFO", new ApiInfoExt());
+    }
 
     /**
      * 启动入口

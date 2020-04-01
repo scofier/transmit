@@ -11,8 +11,8 @@
             <fileMode>0755</fileMode>
         </fileSet>
         <fileSet>
-            <directory>crtr/fileTypeConfig</directory>
-            <outputDirectory>fileTypeConfig</outputDirectory>
+            <directory>crtr/config</directory>
+            <outputDirectory>config</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
     </fileSets>

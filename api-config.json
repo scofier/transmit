@@ -1,20 +1,19 @@
 {
-  "test-request": {
-    "doc": "测试api",
+  "config-demo": {
+    "doc": "百度",
     "request": {
-      "path": "/imp/test1",
+      "path": "/baidu",
       "method": "GET",
       "request-type": "QUERY",
       "response-type": "HTML"
     },
     "api": {
-      "timeout": 10000,
-      "url": "${api_url}",
+      "url": "https://www.baidu.com/",
       "method": "GET",
       "request-type": "QUERY",
       "response-type": "TEXT",
-      "request-ftl": "send.ftl",
-      "response-ftl": "result.ftl"
+      "request-ftl": "transmit/send.ftl",
+      "response-ftl": "transmit/result.ftl"
     }
   }
 }
