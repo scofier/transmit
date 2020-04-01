@@ -15,6 +15,7 @@ import com.hebaibai.ctrt.transmit.util.ext.Ext;
 import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,11 @@ import java.util.*;
  */
 @Slf4j
 public class FileTypeConfig implements CrtrConfig {
+
+    /**
+     * vertx 实例
+     */
+    private Vertx vertx;
 
     /**
      * 配置文件地址
@@ -79,8 +85,9 @@ public class FileTypeConfig implements CrtrConfig {
      * @param configFilePath
      * @throws IOException
      */
-    public FileTypeConfig(String configFilePath) throws Exception {
+    public FileTypeConfig(Vertx vertx, String configFilePath) throws Exception {
         this.configFilePath = configFilePath;
+        this.vertx = vertx;
         String fileText = CrtrUtils.getFileText(configFilePath);
         JSONObject jsonObject = JSONObject.parseObject(fileText);
         //获取系统配置
@@ -185,8 +192,8 @@ public class FileTypeConfig implements CrtrConfig {
                 System.exit(0);
             }
         }
-        for (Ext extObj : Exts.EXT_LIST) {
-            log.info("load ext code {}", extObj.getCode());
+        for (String extCode : Exts.codes()) {
+            log.info("load ext code {}", extCode);
         }
         //配置日志数据库
         if (configJson.containsKey("db")) {
@@ -292,13 +299,9 @@ public class FileTypeConfig implements CrtrConfig {
             transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
             //加载插件
             String extCode = api.getString("extCode");
-            Ext ext = CrtrUtils.ext(extCode);
-            Class<? extends Ext> extClass = ext.getClass();
-            //实例化新的插件对象
-            Ext extInstance = extClass.newInstance();
-            //将当前配置设置进插件
-            extInstance.init(transmitJson);
-            transmitConfig.setExt(extInstance);
+            Ext ext = Exts.get(extCode);
+            ext.init(this.vertx, transmitJson);
+            transmitConfig.setExt(ext);
         }
         //text配置
         else if (transmitJson.containsKey("text")) {
@@ -306,7 +309,7 @@ public class FileTypeConfig implements CrtrConfig {
             JSONObject page = transmitJson.getJSONObject("text");
             String responseFtlPath = getStringConfig(page.getString("response-ftl"));
             transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
-            transmitConfig.setExt(CrtrUtils.BASE_EXT);
+            transmitConfig.setExt(Exts.BASE_EXT);
         }
         return transmitConfig;
     }

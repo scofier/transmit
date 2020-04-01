@@ -1,7 +1,7 @@
 {
   "config": {
     "port": 9527,
-    "cache": true,
+    "cache": false,
     "import": [
       "/home/hjx/work/myprogect/transmit/import-config.json",
       "/home/hjx/work/myprogect/transmit/import-config1.json"
@@ -11,6 +11,25 @@
     "prop": {
       "api_url": "http://www.pubmi.cn/",
       "api_xxx_url": "http://39.99.199.185:9100"
+    }
+  },
+  "api-info": {
+    "doc": "测试api-info",
+    "request": {
+      "path": "/api",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "JSON"
+    },
+    "api": {
+      "timeout": 10000,
+      "extCode": "API_INFO",
+      "url": "http",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "TEXT",
+      "request-ftl": "send.ftl",
+      "response-ftl": "result.ftl"
     }
   }
 }

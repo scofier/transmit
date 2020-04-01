@@ -1,19 +1,30 @@
 package com.hebaibai.ctrt.transmit.util.ext;
 
+import io.vertx.core.Context;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 
 /**
- * 默认插件, 没有配置插件的时候,默认添加
+ * 项目配置展示接口
  */
-public final class BaseExt implements Ext {
+public final class ApiInfoExt implements Ext {
 
+    private Vertx vertx;
+
+    private Map<String, Object> transmitJson;
+
+    private FileSystem fileSystem;
 
     @Override
     public void init(Vertx vertx, Map<String, Object> transmitJson) {
+        this.vertx = vertx;
+        this.transmitJson = transmitJson;
+        this.fileSystem = vertx.fileSystem();
 
     }
 
@@ -53,6 +64,20 @@ public final class BaseExt implements Ext {
      */
     @Override
     public Handler<Promise<String>> getApiResult(String value) {
-        return null;
+        return promise -> {
+            Context context = vertx.getOrCreateContext();
+            //配置文件绝对路径
+            String configFilePath = context.get("config_file_path").toString();
+            fileSystem.readFile(configFilePath, event -> {
+                if (!event.succeeded()) {
+                    promise.complete(event.cause().getMessage());
+                } else {
+                    String configJson = event.result().toString("utf-8");
+                    JsonObject jsonObject = new JsonObject(configJson);
+                    JsonObject config = jsonObject.getJsonObject("config");
+                    promise.complete(configJson);
+                }
+            });
+        };
     }
 }

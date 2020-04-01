@@ -2,6 +2,7 @@ package com.hebaibai.ctrt.transmit.util.ext;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 import java.util.Map;
 
@@ -12,27 +13,15 @@ import java.util.Map;
  */
 public interface Ext {
 
-    /**
-     * @param extCode
-     * @return
-     */
-    boolean support(String extCode);
-
-    /**
-     * 获取插件编号
-     *
-     * @return
-     */
-    String getCode();
-
 
     /**
      * 设置参数
      * 并初始化插件
      *
+     * @param vertx
      * @param transmitJson
      */
-    void init(Map<String, Object> transmitJson);
+    void init(Vertx vertx, Map<String, Object> transmitJson);
 
 
     /**

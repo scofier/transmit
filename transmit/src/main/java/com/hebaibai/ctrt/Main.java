@@ -24,10 +24,10 @@ public class Main {
      */
     public static void main(String[] args) throws Exception {
         //获取配置文件内容
-        FileTypeConfig conf = getConf(args);
+        String configFilePath = getConfigFilePath(args);
         //启动
         CtrtLancher ctrtLancher = new CtrtLancher();
-        ctrtLancher.start(conf);
+        ctrtLancher.start(configFilePath);
     }
 
 
@@ -38,7 +38,7 @@ public class Main {
      * @return
      * @throws ParseException
      */
-    private static FileTypeConfig getConf(String[] args) throws Exception {
+    private static String getConfigFilePath(String[] args) throws Exception {
         Options options = new Options();
         options.addOption("c", "conf", true, "config file path");
         CommandLine parse = new BasicParser().parse(options, args);
@@ -47,9 +47,8 @@ public class Main {
             hf.printHelp("Options", options);
             System.exit(0);
         }
-        String conf = parse.getOptionValue("conf");
-        FileTypeConfig fileTypeConfig = new FileTypeConfig(conf);
-        return fileTypeConfig;
+        String configFilePath = parse.getOptionValue("conf");
+        return configFilePath;
     }
 
 }

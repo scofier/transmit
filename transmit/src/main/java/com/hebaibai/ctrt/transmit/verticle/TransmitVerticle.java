@@ -1,9 +1,9 @@
 package com.hebaibai.ctrt.transmit.verticle;
 
 import com.hebaibai.ctrt.convert.reader.DataReader;
-import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import com.hebaibai.ctrt.transmit.RouterVo;
 import com.hebaibai.ctrt.transmit.TransmitConfig;
+import com.hebaibai.ctrt.transmit.config.CrtrConfig;
 import com.hebaibai.ctrt.transmit.util.Convert;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.Param;
@@ -37,7 +37,7 @@ public class TransmitVerticle extends AbstractVerticle {
      * 启动配置
      */
     @Setter
-    private FileTypeConfig fileTypeConfig;
+    private CrtrConfig crtrConfig;
 
     /**
      * 接收请求
@@ -100,7 +100,7 @@ public class TransmitVerticle extends AbstractVerticle {
         //转换响应数据,并发返回
         router.route().handler(this::convertAndReturn);
         //开启路由
-        httpServer.requestHandler(router).listen(fileTypeConfig.getPort());
+        httpServer.requestHandler(router).listen(crtrConfig.getPort());
         //事件总线
         eventBus = vertx.eventBus();
     }
@@ -119,7 +119,7 @@ public class TransmitVerticle extends AbstractVerticle {
         HttpMethod method = request.method();
         //去除重复的'/'符号
         String path = new File(request.path()).getPath();
-        Handler<Promise<TransmitConfig>> promiseHandler = fileTypeConfig.transmitConfig(method, path);
+        Handler<Promise<TransmitConfig>> promiseHandler = crtrConfig.transmitConfig(method, path);
         extWorkerExecutor.executeBlocking(promiseHandler, event -> {
             if (!event.succeeded()) {
                 routingContext.response().end(error(event.cause()), CHARSET_NAME);
