@@ -4,11 +4,8 @@ import com.hebaibai.ctrt.convert.freemarker.Has;
 import com.hebaibai.ctrt.convert.freemarker.Regular;
 import com.hebaibai.ctrt.transmit.DataType;
 import com.hebaibai.ctrt.transmit.util.convert.BaseConvert;
-import com.hebaibai.ctrt.transmit.util.ext.Ext;
-import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import com.hebaibai.ctrt.transmit.util.param.*;
 import com.hebaibai.ctrt.transmit.util.request.*;
-import com.hebaibai.ctrt.transmit.util.ext.BaseExt;
 import freemarker.template.TemplateDirectiveModel;
 import io.vertx.core.http.HttpMethod;
 
@@ -16,7 +13,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 工具集合
@@ -34,12 +34,6 @@ public class CrtrUtils {
         put("regular", new Regular());
         put("has", new Has());
     }};
-
-    /**
-     * 默认插件
-     */
-    public static final Ext BASE_EXT = new BaseExt();
-
 
     /**
      * 参数获取工具
@@ -116,22 +110,6 @@ public class CrtrUtils {
             }
         }
         return null;
-    }
-
-
-    /**
-     * 获取插件
-     *
-     * @param extCode
-     * @return
-     */
-    public static Ext ext(String extCode) {
-        for (Ext ext : Exts.EXT_LIST) {
-            if (ext.support(extCode)) {
-                return ext;
-            }
-        }
-        return BASE_EXT;
     }
 
     /**

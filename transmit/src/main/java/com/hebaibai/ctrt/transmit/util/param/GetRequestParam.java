@@ -24,11 +24,13 @@ public class GetRequestParam implements Param {
         Map<String, Object> root = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
         MultiMap params = routerVo.getParams();
-        List<Map.Entry<String, String>> entries = params.entries();
-        for (Map.Entry<String, String> entry : entries) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            map.put(key, value);
+        if (params != null) {
+            List<Map.Entry<String, String>> entries = params.entries();
+            for (Map.Entry<String, String> entry : entries) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                map.put(key, value);
+            }
         }
         root.put(DataReader.ROOT_NAME, map);
         return root;

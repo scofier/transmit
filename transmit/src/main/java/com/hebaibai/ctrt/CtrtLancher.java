@@ -1,6 +1,7 @@
 package com.hebaibai.ctrt;
 
-import com.hebaibai.ctrt.transmit.Config;
+import com.hebaibai.ctrt.transmit.config.CrtrConfig;
+import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import com.hebaibai.ctrt.transmit.DataConfig;
 import com.hebaibai.ctrt.transmit.verticle.DataBaseVerticle;
 import com.hebaibai.ctrt.transmit.verticle.TransmitVerticle;
@@ -25,9 +26,18 @@ public class CtrtLancher {
 
     private List<String> verticleIds = new ArrayList<>();
 
-    public void start(Config config) {
+    /**
+     * vert.x 部署 启动
+     *
+     * @param configFilePath 配置文件绝对路径
+     * @throws Exception
+     */
+    public void start(String configFilePath) throws Exception {
         TransmitVerticle transmitVerticle = new TransmitVerticle();
-        transmitVerticle.setConfig(config);
+
+        CrtrConfig crtrConfig = new FileTypeConfig(vertx, configFilePath);
+
+        transmitVerticle.setCrtrConfig(crtrConfig);
 
         //部署
         vertx.deployVerticle(transmitVerticle, res -> {
@@ -37,7 +47,7 @@ public class CtrtLancher {
         });
 
         //数据库部署
-        DataConfig dataConfig = config.getDataConfig();
+        DataConfig dataConfig = crtrConfig.getDataConfig();
         DataBaseVerticle dataBaseVerticle = new DataBaseVerticle();
         if (dataConfig != null) {
             AsyncSQLClient sqlClient = MySQLClient.createShared(
@@ -45,7 +55,7 @@ public class CtrtLancher {
             );
             dataBaseVerticle.setSqlClient(sqlClient);
         }
-        dataBaseVerticle.init(vertx, context);
+        dataBaseVerticle.init(vertx, this.context);
         vertx.deployVerticle(dataBaseVerticle, res -> {
             if (res.succeeded()) {
                 String id = res.result();

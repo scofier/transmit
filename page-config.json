@@ -1,0 +1,35 @@
+{
+  "page-test-1": {
+    "request": {
+      "path": "/page1",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "HTML"
+    },
+    "api": {
+      "response-ftl": "transmit/page.ftl"
+    }
+  },
+  "page-test-2": {
+    "request": {
+      "path": "/page2",
+      "method": "POST",
+      "request-type": "FORM",
+      "response-type": "HTML"
+    },
+    "api": {
+      "response-ftl": "transmit/page.ftl"
+    }
+  },
+  "page-test-3": {
+    "request": {
+      "path": "/page3",
+      "method": "POST",
+      "request-type": "JSON",
+      "response-type": "HTML"
+    },
+    "api": {
+      "response-ftl": "transmit/page.ftl"
+    }
+  }
+}

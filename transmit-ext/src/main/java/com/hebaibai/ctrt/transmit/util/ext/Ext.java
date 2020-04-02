@@ -2,6 +2,7 @@ package com.hebaibai.ctrt.transmit.util.ext;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
+import io.vertx.core.Vertx;
 
 import java.util.Map;
 
@@ -12,27 +13,15 @@ import java.util.Map;
  */
 public interface Ext {
 
-    /**
-     * @param extCode
-     * @return
-     */
-    boolean support(String extCode);
-
-    /**
-     * 获取插件编号
-     *
-     * @return
-     */
-    String getCode();
-
 
     /**
      * 设置参数
      * 并初始化插件
      *
+     * @param vertx
      * @param transmitJson
      */
-    void init(Map<String, Object> transmitJson);
+    void init(Vertx vertx, Map<String, Object> transmitJson);
 
 
     /**
@@ -44,7 +33,7 @@ public interface Ext {
      * @param valueMap 原始数据经过解析后得到的map(放进freemarker的数据)
      * @return
      */
-    Map<String, Object> outRequestBodyMap(String value, Map<String, Object> valueMap) throws Exception;
+    Handler<Promise<Map<String, Object>>> outRequestBodyMap(String value, Map<String, Object> valueMap);
 
 
     /**
@@ -59,7 +48,7 @@ public interface Ext {
      * @return
      * @throws Exception
      */
-    Map<String, Object> apiResponseBodyMap(String value, Map<String, Object> valueMap) throws Exception;
+    Handler<Promise<Map<String, Object>>> apiResponseBodyMap(String value, Map<String, Object> valueMap);
 
     /**
      * 自定义请求方式
