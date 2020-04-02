@@ -18,7 +18,7 @@ public class Main {
 
     static {
         //注册插件
-        Exts.add("API_INFO", new ApiInfoExt());
+        Exts.add("API_INFO", ApiInfoExt.class);
     }
 
     /**

@@ -299,7 +299,8 @@ public class FileTypeConfig implements CrtrConfig {
         transmitConfig.setApiResFtlText(CrtrUtils.getFileText(responseFtlPath));
         //插件编号
         String extCode = api.getString("extCode");
-        Ext ext = Exts.get(extCode);
+        Class<? extends Ext> extClass = Exts.get(extCode);
+        Ext ext = extClass.newInstance();
         ext.init(this.vertx, transmitJson);
         transmitConfig.setExt(ext);
         return transmitConfig;

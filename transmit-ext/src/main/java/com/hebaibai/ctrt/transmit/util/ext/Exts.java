@@ -9,14 +9,14 @@ public class Exts {
     /**
      * 默认的ext
      */
-    public final static Ext BASE_EXT = new BaseExt();
+    public final static Class<? extends Ext> BASE_EXT = BaseExt.class;
 
     /**
      * 插件. 可扩展
      * key   : ext code
      * value : ext class
      */
-    private static Map<String, Ext> EXT_MAP = new HashMap<>();
+    private static Map<String, Class<? extends Ext>> EXT_MAP = new HashMap<>();
 
     /**
      * 通过编号获取ext
@@ -24,7 +24,7 @@ public class Exts {
      * @param extCode
      * @return
      */
-    public static Ext get(String extCode) {
+    public static Class<? extends Ext> get(String extCode) {
         if (extCode == null) {
             return BASE_EXT;
         }
@@ -35,16 +35,16 @@ public class Exts {
      * 添加ext
      *
      * @param extCode
-     * @param ext
+     * @param extClass
      */
-    public static void add(String extCode, Ext ext) {
+    public static void add(String extCode, Class<? extends Ext> extClass) {
         if (extCode == null) {
             throw new UnsupportedOperationException("ext code is null");
         }
         if (EXT_MAP.containsKey(extCode)) {
             throw new UnsupportedOperationException("ext code already exists");
         }
-        EXT_MAP.put(extCode, ext);
+        EXT_MAP.put(extCode, extClass);
     }
 
     /**
