@@ -117,11 +117,14 @@ public class TransmitVerticle extends AbstractVerticle {
      * @param routingContext
      */
     private void requestBody(RoutingContext routingContext) {
+        RouterVo routerVo = new RouterVo();
+        HttpServerRequest request = routingContext.request();
+        routerVo.setParams(request.params());
         routingContext.request().bodyHandler(event -> {
-            RouterVo routerVo = new RouterVo();
             String requestBody = event.toString(CHARSET_NAME);
             routerVo.setUuid(UUID.randomUUID().toString());
             routerVo.setBody(requestBody);
+            log.info("request {} befor:\n{}", routerVo.getUuid(), routerVo.getBody());
             routingContext.put(RouterVo.class.getName(), routerVo);
             routingContext.next();
         });
@@ -140,37 +143,28 @@ public class TransmitVerticle extends AbstractVerticle {
         //去除重复的'/'符号
         String path = new File(request.path()).getPath();
         routerVo.setPath(path);
-        Handler<Promise<TransmitConfig>> promiseHandler = crtrConfig.transmitConfig(method, path);
-        extWorkerExecutor.executeBlocking(promiseHandler, event -> {
+        Handler<Promise<TransmitConfig>> handler = crtrConfig.transmitConfig(method, path);
+        extWorkerExecutor.executeBlocking(handler, event -> {
             if (!event.succeeded()) {
                 routingContext.response().end(error(event.cause()), CHARSET_NAME);
                 return;
-            } else {
-                TransmitConfig transmitConfig = event.result();
-                //接受请求的参数
-                Param param = CrtrUtils.param(method, transmitConfig.getReqType());
-                if (param == null) {
-                    routingContext.response().end(error("not find param util"), CHARSET_NAME);
-                    return;
-                }
-                log.info("request {} befor:\n{}", routerVo.getUuid(), routerVo.getBody());
-                eventBus.send(DataBaseVerticle.EXECUTE_SQL_INSERT, routerVo.getInsertJsonStr());
-                //插件处理参数
-                try {
-                    Map<String, Object> requestMap = param.params(routerVo);
-                    log.info("request {} requestMap:\n{}", routerVo.getUuid(), requestMap);
-                    routerVo.setRequestMap(requestMap);
-                } catch (Exception e) {
-                    log.error("request " + routerVo.getUuid() + " error", e);
-                    routingContext.response().end(error(e), CHARSET_NAME);
-                    return;
-                }
-                routerVo.setTransmitConfig(transmitConfig);
-                routerVo.setParams(request.params());
-                routerVo.setTypeCode(transmitConfig.getCode());
-                routingContext.put(RouterVo.class.getName(), routerVo);
-                routingContext.next();
             }
+            TransmitConfig transmitConfig = event.result();
+            //接受请求的参数
+            Param param = CrtrUtils.param(method, transmitConfig.getReqType());
+            if (param == null) {
+                routingContext.response().end(error("not find param util"), CHARSET_NAME);
+                return;
+            }
+            Map<String, Object> requestMap = param.params(routerVo);
+            log.info("request {} requestMap:\n{}", routerVo.getUuid(), requestMap);
+            routerVo.setRequestMap(requestMap);
+            routerVo.setTransmitConfig(transmitConfig);
+            routerVo.setTypeCode(transmitConfig.getCode());
+            //保存请求记录
+            eventBus.send(DataBaseVerticle.EXECUTE_SQL_INSERT, routerVo.getInsertJsonStr());
+            routingContext.put(RouterVo.class.getName(), routerVo);
+            routingContext.next();
         });
     }
 
@@ -193,23 +187,31 @@ public class TransmitVerticle extends AbstractVerticle {
             return;
         }
         Ext ext = transmitConfig.getExt();
-        try {
-            //经过插件处理后的,原始请求中的参数
-            Map<String, Object> requestMap = ext.outRequestBodyMap(routerVo.getBody(), routerVo.getRequestMap());
+        //经过插件处理后的,原始请求中的参数
+        Handler<Promise<Map<String, Object>>> handler = ext.outRequestBodyMap(routerVo.getBody(), routerVo.getRequestMap());
+        extWorkerExecutor.executeBlocking(handler, event -> {
+            if (!event.succeeded()) {
+                routingContext.response().end(error(event.cause()), CHARSET_NAME);
+                return;
+            }
+            Map<String, Object> requestMap = event.result();
             //获取转换模板并转换数据
             String apiReqFtlText = transmitConfig.getApiReqFtlText();
-            log.debug("request {} ftl:\n{}", routerVo.getUuid(), apiReqFtlText);
-            String value = convert.convert(requestMap, apiReqFtlText, transmitConfig.getCode() + "-REQ");
-            log.info("request {} after:\n{}", routerVo.getUuid(), value);
+            try {
+                String value = convert.convert(requestMap, apiReqFtlText, transmitConfig.getCode() + "-REQ");
+                routerVo.setBody(value);
+                log.info("request {} after:\n{}", routerVo.getUuid(), value);
+            } catch (Exception e) {
+                log.error("request " + routerVo.getUuid() + " error", e);
+                routingContext.response().end(error(e), CHARSET_NAME);
+                return;
+            }
             //更新body
-            routerVo.setBody(value);
             routingContext.put(RouterVo.class.getName(), routerVo);
             routingContext.next();
-        } catch (Exception e) {
-            log.error("request " + routerVo.getUuid() + " error", e);
-            routingContext.response().end(error(e), CHARSET_NAME);
-            return;
-        }
+
+        });
+
     }
 
     /**
@@ -224,13 +226,13 @@ public class TransmitVerticle extends AbstractVerticle {
         Ext ext = transmitConfig.getExt();
         try {
             //请求相应结果处理器
-            Handler<AsyncResult<String>> handler = asyncResult -> {
-                if (!asyncResult.succeeded()) {
-                    routingContext.response().end(error(asyncResult.cause()), CHARSET_NAME);
-                }
-                //响应数据
-                else {
-                    String body = asyncResult.result();
+            Handler<AsyncResult<String>> handler = result -> {
+                if (!result.succeeded()) {
+                    routingContext.response().end(error(result.cause()), CHARSET_NAME);
+                    return;
+                } else {
+                    String body = result.result();
+                    log.info("response {} befor:\n{}", routerVo.getUuid(), body);
                     if (StringUtils.isBlank(body)) {
                         log.error("request " + routerVo.getUuid() + " error no response body");
                         routingContext.response().end(error("no response body"), CHARSET_NAME);
@@ -259,7 +261,6 @@ public class TransmitVerticle extends AbstractVerticle {
                     return;
                 }
                 request.request(webClient, transmitConfig, value, handler);
-
             }
         } catch (Exception e) {
             log.error("request " + routerVo.getUuid() + " error", e);
@@ -276,56 +277,51 @@ public class TransmitVerticle extends AbstractVerticle {
     private void convertAndReturn(RoutingContext routingContext) {
         RouterVo routerVo = routingContext.get(RouterVo.class.getName());
         TransmitConfig transmitConfig = routerVo.getTransmitConfig();
-        log.info("response {} befor:\n{}", routerVo.getUuid(), routerVo.getBody());
-
-        Ext ext = transmitConfig.getExt();
-        try {
-            Map<String, Object> resultMap = new HashMap<>();
-
-            //请求参数
-            Map<String, Object> requestMap = routerVo.getRequestMap();
-
-            //组合参数
-            resultMap.put("REQUEST", requestMap.get(DataReader.ROOT_NAME));
-            if (StringUtils.isNotBlank(transmitConfig.getApiPath())) {
-
-                // 以POST方式, 和配置中的接口返回类型中获取参数
-                Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
-                if (param == null) {
-                    routingContext.response().end(error("not find param util"), CHARSET_NAME);
-                    return;
-                }
-
-                //api响应结果
-                Map<String, Object> responseMap = param.params(routerVo);
-                log.info("request {} responseMap:\n{}", routerVo.getUuid(), responseMap);
-                resultMap.put(DataReader.ROOT_NAME, responseMap.get(DataReader.ROOT_NAME));
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("REQUEST", routerVo.getRequestMap().get(DataReader.ROOT_NAME));
+        //配置了api.url
+        if (StringUtils.isNotBlank(transmitConfig.getApiPath())) {
+            // 以POST方式, 和配置中的接口返回类型中获取参数
+            Param param = CrtrUtils.param(HttpMethod.POST, transmitConfig.getApiResType());
+            if (param == null) {
+                routingContext.response().end(error("not find param util"), CHARSET_NAME);
+                return;
             }
-
-            //经过插件处理后的,api的响应结果
-            resultMap = ext.apiResponseBodyMap(routerVo.getBody(), resultMap);
-
-            //获取转换模板并转换数据
-            String apiResFtlText = transmitConfig.getApiResFtlText();
-            log.debug("response {} ftl:\n{}", routerVo.getUuid(), apiResFtlText);
-
+            //api响应结果
+            Map<String, Object> responseMap = param.params(routerVo);
+            log.info("request {} responseMap:\n{}", routerVo.getUuid(), responseMap);
+            resultMap.put(DataReader.ROOT_NAME, responseMap.get(DataReader.ROOT_NAME));
+        }
+        //经过插件处理后的,api的响应结果
+        Ext ext = transmitConfig.getExt();
+        Handler<Promise<Map<String, Object>>> handler = ext.apiResponseBodyMap(routerVo.getBody(), resultMap);
+        extWorkerExecutor.executeBlocking(handler, event -> {
+            if (!event.succeeded()) {
+                routingContext.response().end(error(event.cause()), CHARSET_NAME);
+                return;
+            }
             Convert convert = CrtrUtils.convert(transmitConfig.getApiResType(), transmitConfig.getResType());
             if (convert == null) {
                 routingContext.response().end(error("not find convert util"), CHARSET_NAME);
                 return;
             }
-            String value = convert.convert(resultMap, apiResFtlText, transmitConfig.getCode() + "-RES");
-            log.info("response {} after:\n{}", routerVo.getUuid(), value);
-
-            //返回响应结果
-            String ContentType = transmitConfig.getResType().val();
-            routingContext.response().putHeader("Content-Type", ContentType);
-            routingContext.response().end(value, CHARSET_NAME);
-        } catch (Exception e) {
-            log.error("response " + routerVo.getUuid() + " error", e);
-            routingContext.response().end(error(e), CHARSET_NAME);
-            return;
-        }
+            Map<String, Object> result = event.result();
+            //获取转换模板并转换数据
+            String apiResFtlText = transmitConfig.getApiResFtlText();
+            log.debug("response {} ftl:\n{}", routerVo.getUuid(), apiResFtlText);
+            try {
+                String value = convert.convert(result, apiResFtlText, transmitConfig.getCode() + "-RES");
+                log.info("response {} after:\n{}", routerVo.getUuid(), value);
+                //返回响应结果
+                String ContentType = transmitConfig.getResType().val();
+                routingContext.response().putHeader("Content-Type", ContentType);
+                routingContext.response().end(value, CHARSET_NAME);
+            } catch (Exception e) {
+                log.error("request " + routerVo.getUuid() + " error", e);
+                routingContext.response().end(error(e), CHARSET_NAME);
+                return;
+            }
+        });
     }
 
     /**

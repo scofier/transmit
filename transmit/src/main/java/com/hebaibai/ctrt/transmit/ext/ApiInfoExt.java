@@ -22,14 +22,10 @@ public final class ApiInfoExt implements Ext {
 
     private Map<String, Object> transmitJson;
 
-    private FileSystem fileSystem;
-
     @Override
     public void init(Vertx vertx, Map<String, Object> transmitJson) {
         this.vertx = vertx;
         this.transmitJson = transmitJson;
-        this.fileSystem = vertx.fileSystem();
-
     }
 
     /**
@@ -41,8 +37,10 @@ public final class ApiInfoExt implements Ext {
      * @throws Exception
      */
     @Override
-    public Map<String, Object> outRequestBodyMap(String value, Map<String, Object> valueMap) throws Exception {
-        return valueMap;
+    public Handler<Promise<Map<String, Object>>> outRequestBodyMap(String value, Map<String, Object> valueMap) {
+        return promise -> {
+            promise.complete(valueMap);
+        };
     }
 
     /**
@@ -56,36 +54,39 @@ public final class ApiInfoExt implements Ext {
      * @throws Exception
      */
     @Override
-    public Map<String, Object> apiResponseBodyMap(String value, Map<String, Object> valueMap) throws Exception {
-        //从系统变量中获取配置文件路径
-        String configFilePath = System.getProperty("file.hjx.ctrt.config");
-        if (configFilePath == null) {
-            valueMap.put(DataReader.ROOT_NAME, "请添加启动参数 file.hjx.ctrt.config 来设置配置文件地址");
-            return valueMap;
-        }
-        try {
-            String configJsonStr = CrtrUtils.getFileText(configFilePath);
-            JSONObject configJson = JSONObject.parseObject(configJsonStr);
-            JSONObject config = configJson.getJSONObject("config");
-            //导入配置
-            if (config.containsKey("import")) {
-                JSONArray importArray = config.getJSONArray("import");
-                for (int i = 0; i < importArray.size(); i++) {
-                    String importFilePath = importArray.getString(i);
-                    String importJsonStr = CrtrUtils.getFileText(importFilePath);
-                    JSONObject importJson = JSONObject.parseObject(importJsonStr);
-                    Set<String> keys = importJson.keySet();
-                    for (String key : keys) {
-                        configJson.put(key, importJson.getJSONObject(key));
+    public Handler<Promise<Map<String, Object>>> apiResponseBodyMap(String value, Map<String, Object> valueMap) {
+        return promise -> {
+            //从系统变量中获取配置文件路径
+            String configFilePath = System.getProperty("file.hjx.ctrt.config");
+            if (configFilePath == null) {
+                valueMap.put(DataReader.ROOT_NAME, "请添加启动参数 file.hjx.ctrt.config 来设置配置文件地址");
+                promise.complete(valueMap);
+                return;
+            }
+            try {
+                String configJsonStr = CrtrUtils.getFileText(configFilePath);
+                JSONObject configJson = JSONObject.parseObject(configJsonStr);
+                JSONObject config = configJson.getJSONObject("config");
+                //导入配置
+                if (config.containsKey("import")) {
+                    JSONArray importArray = config.getJSONArray("import");
+                    for (int i = 0; i < importArray.size(); i++) {
+                        String importFilePath = importArray.getString(i);
+                        String importJsonStr = CrtrUtils.getFileText(importFilePath);
+                        JSONObject importJson = JSONObject.parseObject(importJsonStr);
+                        Set<String> keys = importJson.keySet();
+                        for (String key : keys) {
+                            configJson.put(key, importJson.getJSONObject(key));
+                        }
                     }
                 }
+                valueMap.put(DataReader.ROOT_NAME, configJson.toJSONString());
+            } catch (Exception e) {
+                valueMap.put(DataReader.ROOT_NAME, e.getMessage());
             }
-            valueMap.put(DataReader.ROOT_NAME, configJson.toJSONString());
-            return valueMap;
-        } catch (Exception e) {
-            valueMap.put(DataReader.ROOT_NAME, e.getMessage());
-            return valueMap;
-        }
+            promise.complete(valueMap);
+        };
+
     }
 
     /**

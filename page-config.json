@@ -1,5 +1,5 @@
 {
-  "test-1": {
+  "page-test-1": {
     "request": {
       "path": "/page1",
       "method": "GET",
@@ -7,18 +7,29 @@
       "response-type": "HTML"
     },
     "api": {
-      "response-ftl": "transmit/result.ftl"
+      "response-ftl": "transmit/page.ftl"
     }
   },
-  "test-2": {
+  "page-test-2": {
     "request": {
       "path": "/page2",
-      "method": "GET",
-      "request-type": "QUERY",
+      "method": "POST",
+      "request-type": "FORM",
       "response-type": "HTML"
     },
     "api": {
-      "response-ftl": "transmit/result.ftl"
+      "response-ftl": "transmit/page.ftl"
+    }
+  },
+  "page-test-3": {
+    "request": {
+      "path": "/page3",
+      "method": "POST",
+      "request-type": "JSON",
+      "response-type": "HTML"
+    },
+    "api": {
+      "response-ftl": "transmit/page.ftl"
     }
   }
 }

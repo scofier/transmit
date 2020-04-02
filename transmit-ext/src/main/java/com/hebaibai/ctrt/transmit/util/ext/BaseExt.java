@@ -26,23 +26,27 @@ public final class BaseExt implements Ext {
      * @throws Exception
      */
     @Override
-    public Map<String, Object> outRequestBodyMap(String value, Map<String, Object> valueMap) throws Exception {
-        return valueMap;
+    public Handler<Promise<Map<String, Object>>> outRequestBodyMap(String value, Map<String, Object> valueMap) {
+        return event -> {
+            event.complete(valueMap);
+        };
     }
 
     /**
      * 默认原样返回
      *
      * @param value
-     * @param valueMap:{ ROOT:     api接口返回数据
-     *                   REQUEST:  第三方系统的请求数据
-     *                   }
+     * @param valueMap :{ ROOT:     api接口返回数据
+     *                 REQUEST:  第三方系统的请求数据
+     *                 }
      * @return
      * @throws Exception
      */
     @Override
-    public Map<String, Object> apiResponseBodyMap(String value, Map<String, Object> valueMap) throws Exception {
-        return valueMap;
+    public Handler<Promise<Map<String, Object>>> apiResponseBodyMap(String value, Map<String, Object> valueMap) {
+        return event -> {
+            event.complete(valueMap);
+        };
     }
 
     /**

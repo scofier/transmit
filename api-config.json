@@ -1,17 +1,18 @@
 {
-  "config-demo": {
-    "doc": "百度",
+  "page-test-2": {
+    "doc": "api-test",
     "request": {
-      "path": "/baidu",
+      "path": "/api1",
       "method": "GET",
       "request-type": "QUERY",
-      "response-type": "HTML"
+      "response-type": "TEXT"
     },
     "api": {
-      "url": "https://www.baidu.com/",
+      "timeout": 10000,
+      "url": "http://127.0.0.1:9527/page1",
       "method": "GET",
       "request-type": "QUERY",
-      "response-type": "TEXT",
+      "response-type": "XML",
       "request-ftl": "transmit/send.ftl",
       "response-ftl": "transmit/result.ftl"
     }
