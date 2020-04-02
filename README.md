@@ -110,7 +110,7 @@ sh bin/start.sh
     转发的接口配置
     "api": {
     
-      接口请求地址
+      接口请求地址(缺少节点时直接用'response-ftl'返回)
       "url": "http://127.0.0.1:9003/api/download",
       
       插件编号, 在ext中加载来的
@@ -133,23 +133,6 @@ sh bin/start.sh
       
       响应参数转换模板
       "response-ftl": "/home/hjx/work/myProject/transmit/file/download-res.ftl"
-    }
-
-    新增配置类型, 用于直接返回文字信息(可以用快速定义一个页面, 接口)
-    "text-page": {
-      "doc": "测试页面",
-      "request": {
-        "path": "/index",
-        "method": "GET",
-        "request-type": "QUERY",
-        相应格式为 html
-        "response-type": "HTML"
-      },
-      返回文字信息
-      "text": {      
-        响应信息的模板文件
-        "response-ftl": "result.ftl"
-      }
     }
   }
 }
@@ -245,6 +228,16 @@ code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCo
 </xml>
 ```
 
+#### 参数节点说明
+
+转换参数使用freemarker模板将参数转换为适应api接口的参数
+
+放入模板中的参数顶级有两个节点: 
+
+ROOT		:在转换响应/请求报文时, 参数节点.
+
+REQUEST  	:在转换响应报文时, 请求参数的节点 
+
 ## 返回页面实例
 
 #### 配置示例
@@ -267,7 +260,7 @@ code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCo
       设置响应格式(这里是html, 也可以是 xml, json)
       "response-type": "HTML"
     },
-    "text": {
+    "api": {
       对应的页面文件
       "response-ftl": "result.ftl"
     }
@@ -283,7 +276,7 @@ code=${ROOT.Info.Code}&date=${ROOT.Info.Time}&orderCode=${ROOT.XXX.Order.OrderCo
     <title>index</title>
 </head>
 <body>
-    <h1>${ROOT.uuid}</h1>
+    <h1>${REQUEST.uuid}</h1>
 </body>
 </html>
 ```
