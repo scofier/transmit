@@ -151,6 +151,7 @@ public class FileTypeConfig implements CrtrConfig {
                             if (method == HttpMethod.valueOf(methodStr) && path.equals(pathStr)) {
                                 TransmitConfig transmitConfig = initTransmitConfig(entry.getKey(), value);
                                 event.complete(transmitConfig);
+                                return;
                             }
                         }
                     }
@@ -211,16 +212,15 @@ public class FileTypeConfig implements CrtrConfig {
         if (configJson.containsKey("config")) {
             JSONObject config = configJson.getJSONObject("config");
             configJson.remove("config");
-            if (!config.containsKey("import")) {
-                return;
-            }
-            JSONArray importJsons = config.getJSONArray("import");
-            for (int i = 0; i < importJsons.size(); i++) {
-                String importFilePath = importJsons.getString(i);
-                imports.add(importFilePath);
-                String fileText = CrtrUtils.getFileText(importFilePath);
-                JSONObject jsonObject = JSONObject.parseObject(fileText);
-                addTransmitJson(jsonObject);
+            if (config.containsKey("import")) {
+                JSONArray importJsons = config.getJSONArray("import");
+                for (int i = 0; i < importJsons.size(); i++) {
+                    String importFilePath = importJsons.getString(i);
+                    imports.add(importFilePath);
+                    String fileText = CrtrUtils.getFileText(importFilePath);
+                    JSONObject jsonObject = JSONObject.parseObject(fileText);
+                    addTransmitJson(jsonObject);
+                }
             }
         }
         addTransmitJson(configJson);
