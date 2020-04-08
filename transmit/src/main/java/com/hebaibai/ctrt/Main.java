@@ -1,7 +1,6 @@
 package com.hebaibai.ctrt;
 
 
-import com.hebaibai.ctrt.transmit.config.FileTypeConfig;
 import com.hebaibai.ctrt.transmit.ext.ApiInfoExt;
 import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,7 @@ public class Main {
 
     static {
         //注册插件
-        Exts.add("API_INFO", ApiInfoExt.class);
+        Exts.add("API_INFO", ApiInfoExt.class, "现有接口配置");
     }
 
     /**

@@ -1,2 +1,1 @@
-${ROOT.name}
-${ROOT.aaaa}
+${ROOT}

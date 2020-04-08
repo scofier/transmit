@@ -3,8 +3,8 @@
     "port": 9527,
     "cache": false,
     "import": [
-      "transmit/page-config.json",
-      "transmit/api-config.json",
+      "/home/hjx/work/myprogect/transmit/page-config.json",
+      "/home/hjx/work/myprogect/transmit/api-config.json"
     ],
     "ext": [
     ],
@@ -23,6 +23,7 @@
     },
     "api": {
       "extCode": "API_INFO",
+      "group": "group",
       "response-ftl": "transmit/result.ftl"
     }
   }
