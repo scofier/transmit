@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# java 其他配置参数
-JAVA_OPTS=""
 # 进入当前文件目录
 cd `dirname $0`
 cd ../
@@ -12,7 +10,8 @@ DEPLOY_DIR=`pwd`
 CONFIG_FILE=$DEPLOY_DIR/config/config.json
 # 日志配置文件
 LOG_FILE="-Dlogback.configurationFile=$DEPLOY_DIR/config/logback.xml"
-
+# java 其他配置参数
+JAVA_OPTS="-Dfile.hjx.ctrt.config=$CONFIG_FILE"
 # lib
 LIB_DIR=$DEPLOY_DIR/lib
 LIB_JARS=`ls $LIB_DIR|grep .jar|awk '{print "'$LIB_DIR'/"$0}'|tr "\n" ":"`
