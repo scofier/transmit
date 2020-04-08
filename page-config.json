@@ -1,5 +1,6 @@
 {
   "page-test-1": {
+    "group": "众安",
     "request": {
       "path": "/page1",
       "method": "GET",
@@ -11,6 +12,7 @@
     }
   },
   "page-test-2": {
+    "group": "众安",
     "request": {
       "path": "/page2",
       "method": "POST",
@@ -22,6 +24,7 @@
     }
   },
   "page-test-3": {
+    "group": "永城",
     "request": {
       "path": "/page3",
       "method": "POST",

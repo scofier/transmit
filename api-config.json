@@ -1,6 +1,7 @@
 {
-  "page-test-2": {
+  "api-test-1": {
     "doc": "api-test",
+    "group": "人保",
     "request": {
       "path": "/api1",
       "method": "GET",

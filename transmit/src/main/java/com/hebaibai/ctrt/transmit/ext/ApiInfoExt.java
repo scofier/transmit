@@ -5,11 +5,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.hebaibai.ctrt.convert.reader.DataReader;
 import com.hebaibai.ctrt.transmit.util.CrtrUtils;
 import com.hebaibai.ctrt.transmit.util.ext.Ext;
+import com.hebaibai.ctrt.transmit.util.ext.Exts;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
-import io.vertx.core.file.FileSystem;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,10 +23,22 @@ public final class ApiInfoExt implements Ext {
 
     private Map<String, Object> transmitJson;
 
+    /**
+     * 分组标志
+     */
+    private String group;
+
     @Override
     public void init(Vertx vertx, Map<String, Object> transmitJson) {
         this.vertx = vertx;
         this.transmitJson = transmitJson;
+        Map<String, Object> api = (Map<String, Object>) transmitJson.get("api");
+        if (api.containsKey("group")) {
+            Object group = api.get("group");
+            if (group != null) {
+                this.group = group.toString();
+            }
+        }
     }
 
     /**
@@ -64,23 +77,8 @@ public final class ApiInfoExt implements Ext {
                 return;
             }
             try {
-                String configJsonStr = CrtrUtils.getFileText(configFilePath);
-                JSONObject configJson = JSONObject.parseObject(configJsonStr);
-                JSONObject config = configJson.getJSONObject("config");
-                //导入配置
-                if (config.containsKey("import")) {
-                    JSONArray importArray = config.getJSONArray("import");
-                    for (int i = 0; i < importArray.size(); i++) {
-                        String importFilePath = importArray.getString(i);
-                        String importJsonStr = CrtrUtils.getFileText(importFilePath);
-                        JSONObject importJson = JSONObject.parseObject(importJsonStr);
-                        Set<String> keys = importJson.keySet();
-                        for (String key : keys) {
-                            configJson.put(key, importJson.getJSONObject(key));
-                        }
-                    }
-                }
-                valueMap.put(DataReader.ROOT_NAME, configJson.toJSONString());
+                JSONObject configInfo = getConfigInfo(configFilePath);
+                valueMap.put(DataReader.ROOT_NAME, configInfo.toJSONString());
             } catch (Exception e) {
                 valueMap.put(DataReader.ROOT_NAME, e.getMessage());
             }
@@ -98,5 +96,59 @@ public final class ApiInfoExt implements Ext {
     @Override
     public Handler<Promise<String>> getApiResult(String value) {
         return null;
+    }
+
+    public JSONObject getConfigInfo(String configFilePath) throws IOException {
+        String configJsonStr = CrtrUtils.getFileText(configFilePath);
+        JSONObject configJson = JSONObject.parseObject(configJsonStr);
+        JSONObject config = configJson.getJSONObject("config");
+        configJson.remove("config");
+        //导入配置
+        if (config.containsKey("import")) {
+            JSONArray importArray = config.getJSONArray("import");
+            for (int i = 0; i < importArray.size(); i++) {
+                String importFilePath = importArray.getString(i);
+                String importJsonStr = CrtrUtils.getFileText(importFilePath);
+                JSONObject importJson = JSONObject.parseObject(importJsonStr);
+                Set<String> keys = importJson.keySet();
+                for (String key : keys) {
+                    configJson.put(key, importJson.getJSONObject(key));
+                }
+            }
+        }
+        //根据分组标志分组
+        JSONObject result = new JSONObject();
+        for (String key : configJson.keySet()) {
+            JSONObject obj = configJson.getJSONObject(key);
+            if (obj.containsKey(this.group)) {
+                String groupKey = obj.getString(this.group);
+                if (!result.containsKey(groupKey)) {
+                    result.put(groupKey, new JSONObject());
+                }
+                //去除分组节点
+                obj.remove(this.group);
+                JSONObject groupJson = result.getJSONObject(groupKey);
+                groupJson.put(key, obj);
+                result.put(groupKey, groupJson);
+            } else {
+                result.put(key, obj);
+            }
+        }
+        config = new JSONObject();
+        JSONObject ext = new JSONObject();
+        for (String code : Exts.codes()) {
+            ext.put(code, Exts.explain(code));
+        }
+        config.put("ext", ext);
+        result.put("config", config);
+        return result;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
     }
 }
