@@ -55,11 +55,6 @@ public class FileTypeConfig implements CrtrConfig {
     private boolean cache;
 
     /**
-     * 数据库配置
-     */
-    private DataConfig dataConfig;
-
-    /**
      * 导入的配置
      */
     private Set<String> imports = new HashSet();
@@ -195,11 +190,6 @@ public class FileTypeConfig implements CrtrConfig {
         }
         for (String extCode : Exts.codes()) {
             log.info("load ext code {}", extCode);
-        }
-        //配置日志数据库
-        if (configJson.containsKey("db")) {
-            DataConfig db = configJson.getObject("db", DataConfig.class);
-            this.dataConfig = db;
         }
     }
 
@@ -380,12 +370,6 @@ public class FileTypeConfig implements CrtrConfig {
     @Override
     public int getPort() {
         return port;
-    }
-
-
-    @Override
-    public DataConfig getDataConfig() {
-        return dataConfig;
     }
 
 }

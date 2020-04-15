@@ -284,3 +284,29 @@ REQUEST  	:在转换响应报文时, 请求参数的节点
 #### 对应请求地址
 
 `http://127.0.0.1:8080/index?uuid=12`
+
+
+### 使用数据库配置
+sql
+```mysql
+CREATE TABLE `api_config` (
+  `code` varchar(100) NOT NULL COMMENT '配置编号',
+  `doc` varchar(100) DEFAULT NULL COMMENT '配置说明',
+  `method` varchar(10) NOT NULL COMMENT '请求方式(GET/POST)',
+  `path` varchar(200) NOT NULL COMMENT '请求地址',
+  `request_type` varchar(10) NOT NULL COMMENT '请求参数类型(QUERY/FORM/JSON/TEXT)',
+  `response_type` varchar(10) NOT NULL COMMENT '响应参数类型(QUERY/FORM/JSON/TEXT)',
+  `timeout` int(11) DEFAULT '3000' COMMENT 'api请求超时时间单位ms,默认3000',
+  `ext_code` varchar(50) DEFAULT NULL COMMENT '应用插件编号',
+  `api_url` varchar(200) DEFAULT NULL COMMENT 'api请求地址',
+  `api_method` varchar(10) DEFAULT NULL COMMENT 'api请求方式(GET/POST)',
+  `api_request_type` varchar(10) DEFAULT NULL COMMENT 'api请求参数类型(QUERY/FORM/JSON/TEXT)',
+  `api_response_type` varchar(10) DEFAULT NULL COMMENT 'api响应参数类型(QUERY/FORM/JSON/TEXT)',
+  `request_ftl` text COMMENT 'api请求参数转换模板',
+  `response_ftl` text NOT NULL COMMENT 'api响应参数转换模板',
+  `status` int(11) DEFAULT '1' COMMENT '状态1:可用/0:不可用',
+  PRIMARY KEY (`code`),
+  UNIQUE KEY `api_config_un` (`path`,`method`),
+  KEY `api_config_method_IDX` (`method`,`path`) USING HASH
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+```
