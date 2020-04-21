@@ -1,16 +1,4 @@
 {
-  "page-test-1": {
-    "group": "众安",
-    "request": {
-      "path": "/page1",
-      "method": "GET",
-      "request-type": "QUERY",
-      "response-type": "HTML"
-    },
-    "api": {
-      "response-ftl": "transmit/page.ftl"
-    }
-  },
   "page-test-2": {
     "group": "众安",
     "request": {
@@ -20,9 +8,10 @@
       "response-type": "HTML"
     },
     "api": {
-      "response-ftl": "transmit/page.ftl"
+      "response-ftl": "page.ftl"
     }
   },
+
   "page-test-3": {
     "group": "永城",
     "request": {
@@ -32,7 +21,7 @@
       "response-type": "HTML"
     },
     "api": {
-      "response-ftl": "transmit/page.ftl"
+      "response-ftl": "page.ftl"
     }
   }
 }

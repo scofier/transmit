@@ -46,7 +46,7 @@ public class Main {
     private static String getConfigFilePath(String[] args) throws Exception {
         Options options = new Options();
         options.addOption("c", "conf", true, "config file path");
-        CommandLine parse = new BasicParser().parse(options, args);
+        CommandLine parse = new DefaultParser().parse(options, args);
         if (!parse.hasOption("conf")) {
             HelpFormatter hf = new HelpFormatter();
             hf.printHelp("Options", options);

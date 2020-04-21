@@ -1,12 +1,12 @@
 {
   "api-test-1": {
-    "doc": "api-test",
+    "doc": "本地代理转发接口",
     "group": "人保",
     "request": {
       "path": "/api1",
       "method": "GET",
       "request-type": "QUERY",
-      "response-type": "TEXT"
+      "response-type": "XML"
     },
     "api": {
       "timeout": 10000,
@@ -14,8 +14,20 @@
       "method": "GET",
       "request-type": "QUERY",
       "response-type": "XML",
-      "request-ftl": "transmit/send.ftl",
-      "response-ftl": "transmit/result.ftl"
+      "request-ftl": "send.ftl",
+      "response-ftl": "result.ftl"
+    }
+  },
+  "page-test-1": {
+    "group": "对接方众安",
+    "request": {
+      "path": "/page1",
+      "method": "GET",
+      "request-type": "QUERY",
+      "response-type": "XML"
+    },
+    "api": {
+      "response-ftl": "page.ftl"
     }
   }
 }

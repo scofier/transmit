@@ -1,3 +1,3 @@
 <xml>
-    <name>123123</name>
+    <name>123123  ${REQUEST.uuid} ${code}</name>
 </xml>
